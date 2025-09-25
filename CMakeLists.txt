@@ -43,8 +43,15 @@ ELSE()
     message(FATAL_ERROR "Unsupported platform")
 ENDIF()
 
+# Copy the CSS file
+
+add_custom_target(copy_css ALL
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/ui/style.css ${CMAKE_BINARY_DIR}/ui/style.css
+    COMMENT "Copying CSS file"
+)
+
 # Make sure UI files are copied before building the main executable
-add_dependencies(3d_display_program compile_ui)
+add_dependencies(3d_display_program compile_ui copy_css)
 
 # Link GTK libraries to your executables
 target_link_libraries(3d_display_program ${GTK_LIBRARIES})
