@@ -1,0 +1,49 @@
+@define-color primary #5ec4f7;
+@define-color primary-light #95d1f0;
+
+* {
+  background-color: #00000000;
+  color: black;
+  font-size: 1.5rem;
+  font-family: "Open Sans", sans-serif;
+}
+
+window {
+  background-color: white;
+}
+
+#title_label {
+  font-size: 2.5rem;
+}
+
+separator {
+  background-color: @primary;
+  min-height: 3px;
+  border-radius: 3px;
+}
+
+button {
+  background-image: none;
+  background-color: @primary;
+  border-width: 1px;
+  border-color: #ffffffaa;
+  border-radius: 10px;
+}
+
+#current_display_label {
+  border-width: 1px;
+  border-color: black;
+  border-style: solid;
+  border-radius: 10px 0px 0px 10px;
+}
+
+#change_button {
+  border-radius: 0px;
+  border-color: black;
+  border-radius: 0px 10px 10px 0px;
+  border-left: none;
+}
+
+button:hover {
+  background-color: @primary-light;
+}

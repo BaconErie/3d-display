@@ -1,0 +1,106 @@
+using Gtk 4.0;
+
+Window main_window {
+    title: "Main Window";
+    default-width: 1600;
+    default-height: 900;
+
+    Box main_box {
+        orientation: vertical;
+        spacing: 10;
+        margin-start: 20;
+        margin-end: 20;
+        margin-top: 20;
+        margin-bottom: 20;
+        valign: center;
+
+        Label title_label {
+            name: "title_label";
+            label: "Main Menu";
+            xalign: 0;
+        }
+
+        Separator separator {
+            orientation: horizontal;
+        }
+
+        Box content_box {
+            orientation: horizontal;
+            halign: fill;
+            homogeneous: true;
+
+            // Webcam Wrapper, Left Side
+            Box image_wrapper {
+                orientation: vertical;
+
+                Label image_label {
+                    label: "Webcam Feed";
+                    xalign: 0;
+                }
+
+                Image webcam_image {
+                    icon-name: "image-x-generic";
+                    pixel-size: 500;
+                }
+            }
+
+            // Controls Wrapper, Right Side
+            Box controls_wrapper {
+                orientation: vertical;
+
+                Box currently_displaying_wrapper {
+                    orientation: vertical;
+                    
+                    Label controls_label {
+                            label: "Currently displaying:";
+                            halign: start;
+                        }
+
+
+                    Box controls_label_and_change_button {
+                        orientation: horizontal;
+                        
+                        Label current_display_label {
+                            name: "current_display_label";
+                            label: "object.fbx";
+                            halign: fill;
+                            hexpand: true;
+                            xalign: 0;
+                        }
+
+                        Button change_button {
+                            name: "change_button";
+                            label: "Change object";
+                        }
+                    }
+                    
+                }
+
+                Box controls_buttons_wrapper {
+                    orientation: vertical;
+                    spacing: 10;
+                    halign: center;
+                    valign: center;
+                    vexpand: true;
+
+                    Label {
+                        label: "Controls";
+                        xalign: 0;
+                    }
+
+                    Button start_button {
+                        label: "Start Display";
+                        hexpand: true;
+                    }
+
+                    Button calibrate_button {
+                        label: "Calibrate";
+                        hexpand: true;
+                    }
+                }
+
+
+            }
+        }
+    }
+}
