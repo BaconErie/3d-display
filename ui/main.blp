@@ -1,106 +1,413 @@
 using Gtk 4.0;
 
-Window main_window {
-    title: "Main Window";
-    default-width: 1600;
-    default-height: 900;
+Box main_box {
+    orientation: vertical;
+    spacing: 10;
+    margin-start: 20;
+    margin-end: 20;
+    margin-top: 20;
+    margin-bottom: 20;
+    valign: center;
 
-    Box main_box {
-        orientation: vertical;
-        spacing: 10;
-        margin-start: 20;
-        margin-end: 20;
-        margin-top: 20;
-        margin-bottom: 20;
-        valign: center;
+    Label title_label {
+        name: "title_label";
+        label: "Main Menu";
+        xalign: 0;
+    }
 
-        Label title_label {
-            name: "title_label";
-            label: "Main Menu";
-            xalign: 0;
-        }
+    Separator separator {
+        orientation: horizontal;
+    }
 
-        Separator separator {
-            orientation: horizontal;
-        }
+    Box content_box {
+        orientation: horizontal;
+        halign: fill;
+        homogeneous: true;
 
-        Box content_box {
-            orientation: horizontal;
-            halign: fill;
-            homogeneous: true;
+        // Webcam Wrapper, Left Side
+        Box image_wrapper {
+            orientation: vertical;
 
-            // Webcam Wrapper, Left Side
-            Box image_wrapper {
-                orientation: vertical;
-
-                Label image_label {
-                    label: "Webcam Feed";
-                    xalign: 0;
-                }
-
-                Image webcam_image {
-                    icon-name: "image-x-generic";
-                    pixel-size: 500;
-                }
+            Label image_label {
+                label: "Webcam Feed";
             }
 
-            // Controls Wrapper, Right Side
-            Box controls_wrapper {
+            Picture main_webcam_image {
+
+            }
+        }
+
+        // Controls Wrapper, Right Side
+        Box controls_wrapper {
+            orientation: vertical;
+
+            Box currently_displaying_wrapper {
                 orientation: vertical;
-
-                Box currently_displaying_wrapper {
-                    orientation: vertical;
-                    
-                    Label controls_label {
-                            label: "Currently displaying:";
-                            halign: start;
-                        }
-
-
-                    Box controls_label_and_change_button {
-                        orientation: horizontal;
-                        
-                        Label current_display_label {
-                            name: "current_display_label";
-                            label: "object.fbx";
-                            halign: fill;
-                            hexpand: true;
-                            xalign: 0;
-                        }
-
-                        Button change_button {
-                            name: "change_button";
-                            label: "Change object";
-                        }
+                
+                Label controls_label {
+                        label: "Currently displaying:";
+                        halign: start;
                     }
+
+
+                Box controls_label_and_change_button {
+                    orientation: horizontal;
                     
-                }
-
-                Box controls_buttons_wrapper {
-                    orientation: vertical;
-                    spacing: 10;
-                    halign: center;
-                    valign: center;
-                    vexpand: true;
-
-                    Label {
-                        label: "Controls";
+                    Label current_display_label {
+                        name: "current_display_label";
+                        label: "object.fbx";
+                        halign: fill;
+                        hexpand: true;
                         xalign: 0;
                     }
 
-                    Button start_button {
-                        label: "Start Display";
-                        hexpand: true;
-                    }
-
-                    Button calibrate_button {
-                        label: "Calibrate";
-                        hexpand: true;
+                    Button change_button {
+                        name: "change_button";
+                        label: "Change object";
                     }
                 }
+                
+            }
+
+            Box controls_buttons_wrapper {
+                orientation: vertical;
+                spacing: 10;
+                halign: center;
+                valign: center;
+                vexpand: true;
+
+                Label {
+                    label: "Controls";
+                    xalign: 0;
+                }
+
+                Button start_button {
+                    label: "Start Display";
+                    hexpand: true;
+                }
+
+                Button calibrate_button {
+                    label: "Calibrate";
+                    hexpand: true;
+                }
+            }
 
 
+        }
+    }
+}
+
+Box fov_calibration_box {
+    orientation: vertical;
+    spacing: 10;
+    margin-start: 20;
+    margin-end: 20;
+    margin-top: 20;
+    margin-bottom: 20;
+    valign: center;
+
+    Label {
+        name: "title_label";
+        label: "Field of View Calibration";
+        xalign: 0;
+    }
+
+    Separator {
+        orientation: horizontal;
+    }
+
+    Box {
+        orientation: vertical;
+
+        Picture fov_webcam_image { 
+        }
+
+        Button {
+            label: "Capture";
+        }
+    }
+}
+
+Box measurements_calibration_box {
+    orientation: vertical;
+    spacing: 20;
+    margin-start: 20;
+    margin-end: 20;
+    margin-top: 20;
+    margin-bottom: 20;
+
+    Label {
+        name: "title_label";
+        label: "Calibration: Measurements";
+        xalign: 0;
+    }
+
+    Separator {
+        orientation: horizontal;
+    }
+
+    Box {
+        valign: center;
+        orientation: vertical;
+
+        Label { 
+            label: "Measure the distance from the QR to the webcam. You can remove the QR code after you enter the value.";
+            wrap: true;
+            xalign: 0;
+        }
+
+        Box {
+            margin-bottom: 20;
+            orientation: horizontal;
+
+            Label {
+                label: "QR code distance: ";
+            }
+
+            Entry {
+                placeholder-text: "Value in inches";
+            }
+
+            Label {
+                label: " in.";
             }
         }
+        
+        Label { 
+            label: "Measure the width of a single lenticule. Measure the short side of each lenticule. A single lenticule is a single strip of curved plastic.";
+            wrap: true;
+            xalign: 0;
+        }
+
+        Box {
+            orientation: horizontal;
+
+            Label {
+                label: "Lenticule width: ";
+            }
+
+            Entry {
+                placeholder-text: "Value in inches";
+            }
+
+            Label {
+                label: " in.";
+            }
+
+        }
+
+        Button {
+            margin-top: 10;
+            halign: start;
+            label: "Continue";
+        }
+    }
+}
+
+Box display_density_calibration_box {
+    orientation: vertical;
+    spacing: 10;
+    margin-start: 20;
+    margin-end: 20;
+    margin-top: 20;
+    margin-bottom: 20;
+
+    Label {
+        name: "title_label";
+        label: "Calibration: Display Density";
+        xalign: 0;
+    }
+
+    Separator {
+        orientation: horizontal;
+    }
+
+    Box {
+        orientation: vertical;
+        spacing: 30;
+
+        Label { 
+            label: "The renderer window should be open. Move the window location to the intended location. Then, place ruler parallel to the purple line and, starting from the green line, measure the distance to the red line, in inches.";
+            xalign: 0;
+            wrap: true;
+        }
+
+        Box {
+            orientation: horizontal;
+
+            Label {
+                label: "Distance from green line to red line: ";
+            }
+
+            Entry {
+                placeholder-text: "Value in inches";
+            }
+
+            Label {
+                label: " in.";
+            }
+
+        }
+
+        Button {
+            label: "Continue";
+            halign: start;
+        }
+    }
+}
+
+Box horizontal_displacement_calibration_box {
+    orientation: vertical;
+    spacing: 10;
+    margin-start: 20;
+    margin-end: 20;
+    margin-top: 20;
+    margin-bottom: 20;
+
+    Label {
+        name: "title_label";
+        label: "Calibration: Horizontal Displacement";
+        xalign: 0;
+    }
+
+    Separator {
+        orientation: horizontal;
+    }
+
+    Box {
+        orientation: vertical;
+        spacing: 30;
+
+        Label { 
+            label: "Look at the renderer window. Measure the horizontal distance between the center of the red dot on the renderer window. The green line in the diagram below represents the distance you need to measure.";
+            xalign: 0;
+            wrap: true;
+        }
+
+        Box {
+            orientation: horizontal;
+
+            Label {
+                label: "Distance from green line to red line: ";
+            }
+
+            Entry {
+                placeholder-text: "Value in inches";
+            }
+
+            Label {
+                label: " in.";
+            }
+
+        }
+
+        Button {
+            label: "Continue";
+            halign: start;
+        }
+
+        Picture horizontal_displacement_diagram {
+        }
+    }
+}
+
+Box vertical_displacement_calibration_box {
+    orientation: vertical;
+    spacing: 10;
+    margin-start: 20;
+    margin-end: 20;
+    margin-top: 20;
+    margin-bottom: 20;
+
+    Label {
+        name: "title_label";
+        label: "Calibration: Vertical Displacement";
+        xalign: 0;
+    }
+
+    Separator {
+        orientation: horizontal;
+    }
+
+    Box {
+        orientation: vertical;
+        spacing: 30;
+
+        Label { 
+            label: "Look at the renderer window. Measure the vertical distance between the center of the red dot on the renderer window. The green line in the diagram below represents the distance you need to measure.";
+            xalign: 0;
+            wrap: true;
+        }
+
+        Box {
+            orientation: horizontal;
+
+            Label {
+                label: "Vertical displacement: ";
+            }
+
+            Entry {
+                placeholder-text: "Value in inches";
+            }
+
+            Label {
+                label: " in.";
+            }
+
+        }
+
+        Button {
+            label: "Continue";
+            halign: start;
+        }
+
+        Picture vertical_displacement_diagram {
+        }
+    }
+}
+
+Window main_window {
+    title: "3D Display Control Panel";
+    default-width: 200;
+    default-height: 200;
+
+    Stack {
+            
+        StackPage {
+            name: "main_page";
+            title: "Main Menu";
+            child: main_box;
+        }        
+
+        StackPage {
+            name: "fov_calibration_box";
+            title: "Calibration";
+            child : fov_calibration_box;
+        }
+
+        StackPage {
+            name: "display_density_calibration_box";
+            title: "display_density_calibration_box";
+            child: display_density_calibration_box;
+        }
+
+        StackPage {
+            name: "vertical_displacement_calibration_box";
+            title: "vertical_displacement_calibration_box";
+            child: vertical_displacement_calibration_box;
+        }
+
+        StackPage {
+            name: "horizontal_displacement_calibration_box";
+            title: "horizontal_displacement_calibration_box";
+            child: horizontal_displacement_calibration_box;
+        }
+        
+        StackPage {
+            name: "measurements_calibration_box";
+            title: "Calibration";
+            child : measurements_calibration_box;
+        }
+        
     }
 }

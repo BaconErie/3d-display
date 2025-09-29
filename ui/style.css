@@ -4,7 +4,6 @@
 * {
   background-color: #00000000;
   color: black;
-  font-size: 1.5rem;
   font-family: "Open Sans", sans-serif;
 }
 
@@ -13,7 +12,7 @@ window {
 }
 
 #title_label {
-  font-size: 2.5rem;
+  font-size: 2rem;
 }
 
 separator {
@@ -35,6 +34,14 @@ button {
   border-color: black;
   border-style: solid;
   border-radius: 10px 0px 0px 10px;
+}
+
+entry {
+  border-width: 1px;
+  border-color: black;
+  border-style: solid;
+  border-radius: 10px;
+  padding: 5px;
 }
 
 #change_button {
