@@ -152,11 +152,13 @@ int main() {
 
             detect_first_second_object_in_bounds(eye1, eye2, grayscale_frame, face_rect, eye_detector_model);
 
-            cv::circle(frame, cv::Point(eye1.x + eye1.width/2, eye1.y + eye1.height/2), 5, cv::Scalar(255, 0, 0), -1);
-            cv::circle(frame, cv::Point(eye2.x + eye2.width/2, eye2.y + eye2.height/2), 5, cv::Scalar(255, 0, 0), -1);
+            cv::circle(frame, cv::Point(eye1.x + eye1.width/2, eye1.y + eye1.height/2), 5, cv::Scalar(0, 0, 255), -1);
+            cv::circle(frame, cv::Point(eye2.x + eye2.width/2, eye2.y + eye2.height/2), 5, cv::Scalar(0, 0, 255), -1);
+            
+            cv::rectangle(frame, eye1, cv::Scalar(0, 0, 255), 2);
+            cv::rectangle(frame, eye2, cv::Scalar(0, 0, 255), 2);
 
-
-            cv::circle(frame, cv::Point(x_avg, y_avg), 5, cv::Scalar(0, 0, 255), -1);
+            cv::circle(frame, cv::Point(x_avg, y_avg), 5, cv::Scalar(0, 255, 0), -1);
 
             no_face_counter = 0; 
         } else {
