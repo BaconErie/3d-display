@@ -50,6 +50,13 @@ add_custom_target(copy_css ALL
     COMMENT "Copying CSS file"
 )
 
+# Copy model folder
+
+add_custom_target(copy_models ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/models ${CMAKE_BINARY_DIR}/models
+    COMMENT "Copying model folder"
+)
+
 # Make sure UI files are copied before building the main executable
 add_dependencies(3d_display_program compile_ui copy_css)
 
