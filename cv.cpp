@@ -5,6 +5,9 @@
 #include <opencv2/objdetect.hpp>
 #include <chrono>
 #include <vector>
+#include <algorithm>
+
+const float SEARCH_AREA_SIZE = 1.5f;
 
 void detect_first_face_in_bounds(cv::Rect& output_rect, cv::Mat& grayscale_mat, cv::Rect& search_bounds, cv::CascadeClassifier& face_detector_model) {
     /* Detects and gives the FIRST face detected, as a Rect. Mat must be already grayscale */
@@ -50,6 +53,8 @@ int main() {
 
     cv::Mat frame;
     cv::Mat grayscale_frame;
+
+    int no_face_counter = 0;
     
     while (true) {
         end = std::chrono::steady_clock::now();
@@ -65,7 +70,11 @@ int main() {
             return -1;
         }
 
-        search_bounds = cv::Rect(frame.cols/2, 0, frame.cols/2, frame.rows);
+        if (search_bounds == cv::Rect(0,0,0,0)) {
+            search_bounds = cv::Rect(0, 0, frame.cols, frame.rows);
+        }
+
+
         cv::rectangle(frame, search_bounds, cv::Scalar(255, 0, 0), 2);
 
         cv::cvtColor(frame, grayscale_frame, cv::COLOR_BGR2GRAY);
@@ -76,6 +85,26 @@ int main() {
 
         if (face_rect != cv::Rect(-1, -1, -1, -1)) {
             cv::rectangle(frame, face_rect, cv::Scalar(0, 255, 0), 2);
+
+            int x_new = std::clamp((int)(face_rect.x + face_rect.width/2 - face_rect.width*SEARCH_AREA_SIZE/2), 0, frame.cols);
+            int y_new = std::clamp((int)(face_rect.y + face_rect.height/2 - face_rect.height*SEARCH_AREA_SIZE/2), 0, frame.rows);
+            int width_new = std::clamp((int)(face_rect.width*SEARCH_AREA_SIZE), 0, frame.cols - x_new);
+            int height_new = std::clamp((int)(face_rect.height*SEARCH_AREA_SIZE), 0, frame.rows - y_new);
+
+            search_bounds = cv::Rect(
+                x_new,
+                y_new,
+                width_new,
+                height_new
+            );
+
+            no_face_counter = 0; 
+        } else {
+            no_face_counter++;
+            if (no_face_counter >= 3) { // If no face detected for 3 consecutive frames, reset search bounds
+                search_bounds = cv::Rect(0, 0, frame.cols, frame.rows);
+                no_face_counter = 0;
+            }
         }
 
         cv::imshow("Webcam", frame);
