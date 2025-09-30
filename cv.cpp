@@ -12,7 +12,12 @@ const float SEARCH_AREA_SIZE = 1.5f;
 const int SMOOTHING_QUEUE_SIZE = 5;
 
 void detect_first_second_object_in_bounds(cv::Rect& first_rect, cv::Rect& second_rect, cv::Mat& grayscale_mat, cv::Rect& search_bounds, cv::CascadeClassifier& detector_model) {
-    /* Detects and gives the FIRST face detected, as a Rect. Mat must be already grayscale */
+    /* Detects and gives the two objects in the specified bounds.
+       Gets the objects with the lowest y coordinates first (i.e. higher up)
+       Mat must be already grayscale 
+    */
+
+    std::cout << search_bounds << std::endl;
 
     if (grayscale_mat.type() != CV_8UC1) {
         std::cerr << "Error: detect_first_face_in_bounds's Mat must be grayscale." << std::endl;
@@ -24,17 +29,23 @@ void detect_first_second_object_in_bounds(cv::Rect& first_rect, cv::Rect& second
     std::vector<cv::Rect> objects;
     detector_model.detectMultiScale(sub_mat, objects);
 
-    if (objects.size() == 0) {
-        first_rect = cv::Rect(-1, -1, -1, -1);
-    } else {
-        first_rect = objects[0] + search_bounds.tl(); // Adjust to full image coordinates
-    }
+    first_rect = cv::Rect(-1, -1, -1, -1);
+    second_rect = cv::Rect(-1, -1, -1, -1);
     
-    if (objects.size() >= 2) {
-        second_rect = objects[1] + search_bounds.tl(); // Adjust to full image coordinates
-    } else if (objects.size() < 2) {
-        second_rect = cv::Rect(-1, -1, -1, -1);
+    for (int i=0; i<objects.size(); i++) {
+        if (objects[i].y < first_rect.y || first_rect == cv::Rect(-1, -1, -1, -1)) {
+            second_rect = first_rect;
+            first_rect = objects[i];
+        } else if (objects[i].y < second_rect.y || second_rect == cv::Rect(-1, -1, -1, -1)) {
+            second_rect = objects[i];
+        }
     }
+
+    first_rect.x += search_bounds.x;
+    first_rect.y += search_bounds.y;
+
+    second_rect.x += search_bounds.x;
+    second_rect.y += search_bounds.y;
 }
 
 
@@ -45,6 +56,12 @@ int main() {
     cv::CascadeClassifier face_detector_model;
     if (!face_detector_model.load("models/face_detector_model.xml")) {
         std::cerr << "Error: Could not load face model." << std::endl;
+        return -1;
+    }
+
+    cv::CascadeClassifier eye_detector_model;
+    if (!eye_detector_model.load("models/eye_detector_model.xml")) {
+        std::cerr << "Error: Could not load eye model." << std::endl;
         return -1;
     }
 
@@ -99,7 +116,7 @@ int main() {
 
         detect_first_second_object_in_bounds(face_rect, eye1, grayscale_frame, search_bounds, face_detector_model);
 
-        if (face_rect != cv::Rect(-1, -1, -1, -1)) {
+        if (face_rect.width != -1) {
             cv::rectangle(frame, face_rect, cv::Scalar(0, 255, 0), 2);
 
             int x_new = std::clamp((int)(face_rect.x + face_rect.width/2 - face_rect.width*SEARCH_AREA_SIZE/2), 0, frame.cols);
@@ -130,6 +147,14 @@ int main() {
 
             int x_avg = moving_window_x_sum / last_x_vals.size();
             int y_avg = moving_window_y_sum / last_y_vals.size();
+
+            // Look for eye1 and eye2
+
+            detect_first_second_object_in_bounds(eye1, eye2, grayscale_frame, face_rect, eye_detector_model);
+
+            cv::circle(frame, cv::Point(eye1.x + eye1.width/2, eye1.y + eye1.height/2), 5, cv::Scalar(255, 0, 0), -1);
+            cv::circle(frame, cv::Point(eye2.x + eye2.width/2, eye2.y + eye2.height/2), 5, cv::Scalar(255, 0, 0), -1);
+
 
             cv::circle(frame, cv::Point(x_avg, y_avg), 5, cv::Scalar(0, 0, 255), -1);
 
