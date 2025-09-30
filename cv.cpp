@@ -6,8 +6,10 @@
 #include <chrono>
 #include <vector>
 #include <algorithm>
+#include <queue>
 
 const float SEARCH_AREA_SIZE = 1.5f;
+const int SMOOTHING_QUEUE_SIZE = 5;
 
 void detect_first_face_in_bounds(cv::Rect& output_rect, cv::Mat& grayscale_mat, cv::Rect& search_bounds, cv::CascadeClassifier& face_detector_model) {
     /* Detects and gives the FIRST face detected, as a Rect. Mat must be already grayscale */
@@ -55,7 +57,12 @@ int main() {
     cv::Mat grayscale_frame;
 
     int no_face_counter = 0;
-    
+
+    std::queue<int> last_x_vals = std::queue<int>();
+    std::queue<int> last_y_vals = std::queue<int>();
+    int moving_window_x_sum = 0;
+    int moving_window_y_sum = 0;
+
     while (true) {
         end = std::chrono::steady_clock::now();
 
@@ -98,6 +105,25 @@ int main() {
                 height_new
             );
 
+            last_x_vals.push(face_rect.x + face_rect.width/2);
+            last_y_vals.push(face_rect.y + face_rect.height/2);
+            moving_window_x_sum += face_rect.x + face_rect.width/2;
+            moving_window_y_sum += face_rect.y + face_rect.height/2;
+
+            if (last_x_vals.size() > SMOOTHING_QUEUE_SIZE) {
+                moving_window_x_sum -= last_x_vals.front();
+                last_x_vals.pop();
+            }
+            if (last_y_vals.size() > SMOOTHING_QUEUE_SIZE) {
+                moving_window_y_sum -= last_y_vals.front();
+                last_y_vals.pop();
+            }
+
+            int x_avg = moving_window_x_sum / last_x_vals.size();
+            int y_avg = moving_window_y_sum / last_y_vals.size();
+
+            cv::circle(frame, cv::Point(x_avg, y_avg), 5, cv::Scalar(0, 0, 255), -1);
+
             no_face_counter = 0; 
         } else {
             no_face_counter++;
@@ -106,6 +132,10 @@ int main() {
                 no_face_counter = 0;
             }
         }
+        
+        
+
+        
 
         cv::imshow("Webcam", frame);
         if (cv::waitKey(1000/120) == 'q') { // Wait for a key press
