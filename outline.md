@@ -115,3 +115,40 @@ After everything has been set up
 
 most of the processing occurs, including webcam processing, face detection,
 interlacing algorithms, program
+
+# Timeline
+
+- Sep 25 - Oct 9 (2 weeks, at the same time as other tasks): Buy lens sheet
+- Sep 25 - Oct 2 (1 week): UI for controller window/program. This will control
+  the 3D renderer and computer vision program.
+- Oct 2 - Oct 16 (2 weeks): Write face detection and eye tracking in C++ with
+  OpenCV. This will be a separate program that communicates with the controller
+  program.
+- Oct 16 - Oct 30 (2 weeks): Inter-process communication between controller and
+  CV program. I will be using pipes to coordinate between the two programs, and
+  shared memory to share the webcam images. By the end of this week, a button on
+  the controller will be able to enable and disable webcam processing on the CV
+  program.
+- Oct 30 - Nov 14 (2 weeks): Calibration process for the controller software.
+  For now, only store the values in a file and in memory. This part will also
+  include more CV-controller coordination, as one portion of the calibration
+  will require the webcam.
+- Nov 14 - Nov 21 (1 week): Begin 3D rendering of currently fixed virtual object
+  using the Godot game engine. Program should be able to render a 3D object and
+  display an interlaced image based on interlacing instructions stored in a
+  variable. The interlacing instructions will be updated later so that they will
+  update based on instructions from the controller program.
+- Nov 21 - Nov 28 (1 week): Using face data from the CV program and calibration
+  data, calculation proper interlacing instructions for the 3D renderer. Don't
+  transmit to renderer yet.
+- Nov 28 - Dec 12 (2 weeks): Implement inter-process communication between the
+  controller program and the 3D renderer. Use socket communication, because
+  Godot only has support for sockets. Will need to implement a socket server on
+  the controller program, which may be difficult. The connection from Godot to
+  socket server should be easy; I have experience with this before. By the end
+  of this, the 3D renderer will be able to move around the virtual camera based
+  on face data from the CV program.
+- Dec 12 - Jan 1 (3 weeks): Optimize face and eye detection. Look into
+  hyperparameters, or train my own model. There is both face and eye datasets on
+  Kaggle and other sites, and I can always augment these datasets by introducing
+  noise, rotation, occlusions, and other transformations.
