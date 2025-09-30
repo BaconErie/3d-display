@@ -72,7 +72,7 @@ int main() {
 
         cv::putText(frame, "FPS: " + std::to_string(fps), cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 2);
 
-        identify_first_face_in_bounds(face_rect, grayscale_frame, search_bounds, face_detector_model);
+        detect_first_face_in_bounds(face_rect, grayscale_frame, search_bounds, face_detector_model);
 
         if (face_rect != cv::Rect(-1, -1, -1, -1)) {
             cv::rectangle(frame, face_rect, cv::Scalar(0, 255, 0), 2);
