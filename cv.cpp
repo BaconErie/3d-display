@@ -11,7 +11,7 @@
 const float SEARCH_AREA_SIZE = 1.5f;
 const int SMOOTHING_QUEUE_SIZE = 5;
 
-void detect_first_face_in_bounds(cv::Rect& output_rect, cv::Mat& grayscale_mat, cv::Rect& search_bounds, cv::CascadeClassifier& face_detector_model) {
+void detect_first_second_object_in_bounds(cv::Rect& first_rect, cv::Rect& second_rect, cv::Mat& grayscale_mat, cv::Rect& search_bounds, cv::CascadeClassifier& detector_model) {
     /* Detects and gives the FIRST face detected, as a Rect. Mat must be already grayscale */
 
     if (grayscale_mat.type() != CV_8UC1) {
@@ -21,16 +21,22 @@ void detect_first_face_in_bounds(cv::Rect& output_rect, cv::Mat& grayscale_mat, 
 
     cv::Mat sub_mat = cv::Mat(grayscale_mat, search_bounds);
 
-    std::vector<cv::Rect> faces;
-    face_detector_model.detectMultiScale(sub_mat, faces);
+    std::vector<cv::Rect> objects;
+    detector_model.detectMultiScale(sub_mat, objects);
 
-    if (faces.size() == 0) {
-        output_rect = cv::Rect(-1, -1, -1, -1);
+    if (objects.size() == 0) {
+        first_rect = cv::Rect(-1, -1, -1, -1);
     } else {
-        output_rect = faces[0] + search_bounds.tl(); // Adjust to full image coordinates
+        first_rect = objects[0] + search_bounds.tl(); // Adjust to full image coordinates
     }
     
+    if (objects.size() >= 2) {
+        second_rect = objects[1] + search_bounds.tl(); // Adjust to full image coordinates
+    } else if (objects.size() < 2) {
+        second_rect = cv::Rect(-1, -1, -1, -1);
+    }
 }
+
 
 int main() {
     std::cout << "Hello, helper!" << std::endl;
@@ -52,6 +58,9 @@ int main() {
     std::chrono::steady_clock::time_point end;
     cv::Rect face_rect;
     cv::Rect search_bounds; // Initial search bounds
+
+    cv::Rect eye1;
+    cv::Rect eye2;
 
     cv::Mat frame;
     cv::Mat grayscale_frame;
@@ -88,7 +97,7 @@ int main() {
 
         cv::putText(frame, "FPS: " + std::to_string(fps), cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 2);
 
-        detect_first_face_in_bounds(face_rect, grayscale_frame, search_bounds, face_detector_model);
+        detect_first_second_object_in_bounds(face_rect, eye1, grayscale_frame, search_bounds, face_detector_model);
 
         if (face_rect != cv::Rect(-1, -1, -1, -1)) {
             cv::rectangle(frame, face_rect, cv::Scalar(0, 255, 0), 2);
