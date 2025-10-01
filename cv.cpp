@@ -74,8 +74,10 @@ int main() {
         return -1;
     }
 
-    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point begin;
     std::chrono::steady_clock::time_point end;
+    std::chrono::steady_clock::time_point cv_begin;
+    std::chrono::steady_clock::time_point cv_end;
     cv::Rect face_rect;
     cv::Rect search_bounds; // Initial search bounds
 
@@ -87,18 +89,17 @@ int main() {
 
     int no_face_counter = 0;
 
+    int last_fps = 0;
+    int percent_time_in_cv = 0;
+
     std::queue<int> last_x_vals = std::queue<int>();
     std::queue<int> last_y_vals = std::queue<int>();
     int moving_window_x_sum = 0;
     int moving_window_y_sum = 0;
 
     while (true) {
-        end = std::chrono::steady_clock::now();
-
-        std::chrono::duration<double> elapsed_seconds = end - begin;
-        int fps = (int)(1.0 / elapsed_seconds.count());
-
         begin = std::chrono::steady_clock::now();
+       
         
         cap >> frame; // Capture a frame
         if (frame.empty()) {
@@ -115,8 +116,10 @@ int main() {
 
         cv::cvtColor(frame, grayscale_frame, cv::COLOR_BGR2GRAY);
 
-        cv::putText(frame, "FPS: " + std::to_string(fps), cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 2);
+        cv::putText(frame, "FPS: " + std::to_string(last_fps) + " Percent time in CV: " + std::to_string(percent_time_in_cv) + "%", cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 2);
 
+        
+        cv_begin = std::chrono::steady_clock::now();
         detect_first_second_object_in_bounds(face_rect, eye1, grayscale_frame, search_bounds, face_detector_model);
 
         if (face_rect.width != -1) {
@@ -175,15 +178,18 @@ int main() {
                 no_face_counter = 0;
             }
         }
-        
-        
-
-        
+        cv_end = std::chrono::steady_clock::now();
+        std::chrono::duration<double> cv_elapsed_seconds = cv_end - cv_begin;
 
         cv::imshow("Webcam", frame);
         if (cv::waitKey(1000/120) == 'q') { // Wait for a key press
             break;
         }
+
+        end = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end - begin;
+        percent_time_in_cv = int(cv_elapsed_seconds.count() / elapsed_seconds.count() * 100.0);
+        last_fps = (int)(1.0 / elapsed_seconds.count());
 
         
     }
