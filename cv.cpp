@@ -67,7 +67,45 @@ void detect_first_second_object_in_bounds(cv::Rect& first_rect, cv::Rect& second
 
 
 int main() {
-    std::cout << "Hello, helper!" << std::endl;
+    /************************
+    *                       *
+    *   DECLARE VARIABLES   *
+    *                       *
+    *************************/
+
+    // Timing variables
+    std::chrono::steady_clock::time_point begin;
+    std::chrono::steady_clock::time_point end;
+    std::chrono::steady_clock::time_point cv_begin;
+    std::chrono::steady_clock::time_point cv_end;
+    int last_fps = 0;
+    int percent_time_in_cv = 0;
+
+    cv::Rect face_rect; // Output for face detection
+    cv::Rect search_bounds; // Initial search bounds
+
+    cv::Rect eye1; // Output for first eye detection
+    cv::Rect eye2; // Output for second eye detection
+
+    cv::Mat frame; // Current frame from webcam
+    cv::Mat grayscale_frame; // Current frame in grayscale
+
+    int no_face_counter = 0; // Counts how many frames in a row no face was detected
+                             // Used to reset search bounds if too many frames in a row have no face
+
+    // Smoothing variables
+    std::queue<int> last_x_vals = std::queue<int>();
+    std::queue<int> last_y_vals = std::queue<int>();
+    int moving_window_x_sum = 0;
+    int moving_window_y_sum = 0;
+
+
+    /************************
+    *                       *
+    *    ONE TIME SETUP     *
+    *                       *
+    *************************/
+    
 
     // Load face model
     cv::CascadeClassifier face_detector_model;
@@ -88,28 +126,11 @@ int main() {
         return -1;
     }
 
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end;
-    std::chrono::steady_clock::time_point cv_begin;
-    std::chrono::steady_clock::time_point cv_end;
-    cv::Rect face_rect;
-    cv::Rect search_bounds; // Initial search bounds
-
-    cv::Rect eye1;
-    cv::Rect eye2;
-
-    cv::Mat frame;
-    cv::Mat grayscale_frame;
-
-    int no_face_counter = 0;
-
-    int last_fps = 0;
-    int percent_time_in_cv = 0;
-
-    std::queue<int> last_x_vals = std::queue<int>();
-    std::queue<int> last_y_vals = std::queue<int>();
-    int moving_window_x_sum = 0;
-    int moving_window_y_sum = 0;
+    /************************
+    *                       *
+    *       MAIN LOOP       *
+    *                       *
+    *************************/
 
     while (true) {
         begin = std::chrono::steady_clock::now();
@@ -122,6 +143,7 @@ int main() {
         }
 
         if (search_bounds == cv::Rect(0,0,0,0)) {
+            // First frame, set search bounds to whole frame
             search_bounds = cv::Rect(0, 0, frame.cols, frame.rows);
         }
 
@@ -137,6 +159,8 @@ int main() {
         detect_face_in_bounds(face_rect, grayscale_frame, search_bounds, face_detector_model);
 
         if (face_rect.width != -1) {
+            // Face detected
+
             cv::rectangle(frame, face_rect, cv::Scalar(0, 255, 0), 2);
 
             int x_new = std::clamp((int)(face_rect.x + face_rect.width/2 - face_rect.width*SEARCH_AREA_SIZE/2), 0, frame.cols);
