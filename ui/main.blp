@@ -174,7 +174,7 @@ Box measurements_calibration_box {
         }
         
         Label { 
-            label: "Measure the width of a single lenticule. Measure the short side of each lenticule. A single lenticule is a single strip of curved plastic.";
+            label: "Enter the lenticule density of your lens sheet, in Lenticules Per Inch (LPI).";
             wrap: true;
             xalign: 0;
         }
@@ -183,15 +183,15 @@ Box measurements_calibration_box {
             orientation: horizontal;
 
             Label {
-                label: "Lenticule width: ";
+                label: "Lenticule density: ";
             }
 
             Entry {
-                placeholder-text: "Value in inches";
+                placeholder-text: "Value in LPI";
             }
 
             Label {
-                label: " in.";
+                label: " LPI";
             }
 
         }
@@ -373,35 +373,35 @@ Window main_window {
 
     Stack {
             
-        StackPage {
-            name: "main_page";
-            title: "Main Menu";
-            child: main_box;
-        }        
+        // StackPage {
+        //     name: "main_page";
+        //     title: "Main Menu";
+        //     child: main_box;
+        // }        
 
-        StackPage {
-            name: "fov_calibration_box";
-            title: "Calibration";
-            child : fov_calibration_box;
-        }
+        // StackPage {
+        //     name: "fov_calibration_box";
+        //     title: "Calibration";
+        //     child : fov_calibration_box;
+        // }
 
-        StackPage {
-            name: "display_density_calibration_box";
-            title: "display_density_calibration_box";
-            child: display_density_calibration_box;
-        }
+        // StackPage {
+        //     name: "display_density_calibration_box";
+        //     title: "display_density_calibration_box";
+        //     child: display_density_calibration_box;
+        // }
 
-        StackPage {
-            name: "vertical_displacement_calibration_box";
-            title: "vertical_displacement_calibration_box";
-            child: vertical_displacement_calibration_box;
-        }
+        // StackPage {
+        //     name: "vertical_displacement_calibration_box";
+        //     title: "vertical_displacement_calibration_box";
+        //     child: vertical_displacement_calibration_box;
+        // }
 
-        StackPage {
-            name: "horizontal_displacement_calibration_box";
-            title: "horizontal_displacement_calibration_box";
-            child: horizontal_displacement_calibration_box;
-        }
+        // StackPage {
+        //     name: "horizontal_displacement_calibration_box";
+        //     title: "horizontal_displacement_calibration_box";
+        //     child: horizontal_displacement_calibration_box;
+        // }
         
         StackPage {
             name: "measurements_calibration_box";
