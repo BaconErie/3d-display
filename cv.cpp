@@ -36,11 +36,6 @@ void detect_first_second_object_in_bounds(cv::Rect& first_rect, cv::Rect& second
        Mat must be already grayscale 
     */
 
-    if (grayscale_mat.type() != CV_8UC1) {
-        std::cerr << "Error: detect_first_face_in_bounds's Mat must be grayscale." << std::endl;
-        return;
-    }
-
     cv::Mat sub_mat = cv::Mat(grayscale_mat, search_bounds);
 
     std::vector<cv::Rect> objects;
