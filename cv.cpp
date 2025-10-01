@@ -17,8 +17,6 @@ void detect_first_second_object_in_bounds(cv::Rect& first_rect, cv::Rect& second
        Mat must be already grayscale 
     */
 
-    std::cout << search_bounds << std::endl;
-
     if (grayscale_mat.type() != CV_8UC1) {
         std::cerr << "Error: detect_first_face_in_bounds's Mat must be grayscale." << std::endl;
         return;
@@ -41,11 +39,16 @@ void detect_first_second_object_in_bounds(cv::Rect& first_rect, cv::Rect& second
         }
     }
 
-    first_rect.x += search_bounds.x;
-    first_rect.y += search_bounds.y;
 
-    second_rect.x += search_bounds.x;
-    second_rect.y += search_bounds.y;
+    if (first_rect != cv::Rect(-1, -1, -1, -1)) {
+        first_rect.x += search_bounds.x;
+        first_rect.y += search_bounds.y;
+    }
+
+    if (second_rect != cv::Rect(-1, -1, -1, -1)) {
+        second_rect.x += search_bounds.x;
+        second_rect.y += search_bounds.y;
+    }
 }
 
 
@@ -150,13 +153,17 @@ int main() {
 
             // Look for eye1 and eye2
 
-            detect_first_second_object_in_bounds(eye1, eye2, grayscale_frame, face_rect, eye_detector_model);
+            cv::Rect eye_search_bounds = cv::Rect(face_rect.x, face_rect.y, face_rect.width, face_rect.height/2);
+            detect_first_second_object_in_bounds(eye1, eye2, grayscale_frame, eye_search_bounds, eye_detector_model);
 
-            cv::circle(frame, cv::Point(eye1.x + eye1.width/2, eye1.y + eye1.height/2), 5, cv::Scalar(0, 0, 255), -1);
-            cv::circle(frame, cv::Point(eye2.x + eye2.width/2, eye2.y + eye2.height/2), 5, cv::Scalar(0, 0, 255), -1);
-            
-            cv::rectangle(frame, eye1, cv::Scalar(0, 0, 255), 2);
-            cv::rectangle(frame, eye2, cv::Scalar(0, 0, 255), 2);
+            if (eye1.width != -1) {
+                cv::circle(frame, cv::Point(eye1.x + eye1.width/2, eye1.y + eye1.height/2), 5, cv::Scalar(0, 0, 255), -1);  
+                cv::rectangle(frame, eye1, cv::Scalar(0, 0, 255), 2);
+            }
+            if (eye2.width != -1) {
+                cv::circle(frame, cv::Point(eye2.x + eye2.width/2, eye2.y + eye2.height/2), 5, cv::Scalar(0, 0, 255), -1);
+                cv::rectangle(frame, eye2, cv::Scalar(0, 0, 255), 2);
+            }
 
             cv::circle(frame, cv::Point(x_avg, y_avg), 5, cv::Scalar(0, 255, 0), -1);
 
