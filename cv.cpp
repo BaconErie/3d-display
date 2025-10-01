@@ -11,6 +11,25 @@
 const float SEARCH_AREA_SIZE = 1.5f;
 const int SMOOTHING_QUEUE_SIZE = 5;
 
+void detect_face_in_bounds(cv::Rect& face_rect, cv::Mat& grayscale_mat, cv::Rect& search_bounds, cv::CascadeClassifier& face_model) {
+    /* Detects and gives the first face in the specified bounds.
+       Mat must be already grayscale 
+    */
+
+    cv::Mat sub_mat = cv::Mat(grayscale_mat, search_bounds);
+
+    std::vector<cv::Rect> faces;
+    face_model.detectMultiScale(sub_mat, faces);
+
+    if (faces.size() > 0) {
+        face_rect = faces[0];
+        face_rect.x += search_bounds.x;
+        face_rect.y += search_bounds.y;
+    } else {
+        face_rect = cv::Rect(-1, -1, -1, -1);
+    }
+}
+
 void detect_first_second_object_in_bounds(cv::Rect& first_rect, cv::Rect& second_rect, cv::Mat& grayscale_mat, cv::Rect& search_bounds, cv::CascadeClassifier& detector_model) {
     /* Detects and gives the two objects in the specified bounds.
        Gets the objects with the lowest y coordinates first (i.e. higher up)
@@ -120,7 +139,7 @@ int main() {
 
         
         cv_begin = std::chrono::steady_clock::now();
-        detect_first_second_object_in_bounds(face_rect, eye1, grayscale_frame, search_bounds, face_detector_model);
+        detect_face_in_bounds(face_rect, grayscale_frame, search_bounds, face_detector_model);
 
         if (face_rect.width != -1) {
             cv::rectangle(frame, face_rect, cv::Scalar(0, 255, 0), 2);
