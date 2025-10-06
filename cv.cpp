@@ -18,15 +18,19 @@ void detect_face_and_eyes_in_bounds(cv::Rect& face_rect, cv::Point& left_eye, cv
     /* Detects and gives the first face in the specified bounds.
     */
 
+    if (search_bounds.width < 63 || search_bounds.height < 63) {
+        // Minimum size for the face detector is 63x63, otherwise it crashes(?)
+        face_rect = cv::Rect(-1, -1, -1, -1);
+        return;
+    }
+   
+
     face_model->setInputSize(search_bounds.size());
 
     cv::Mat sub_mat = cv::Mat(full_mat, search_bounds);
     cv::Mat output_array;
 
-
     face_model->detect(sub_mat, output_array);
-
-    std::cout << output_array << std::endl;
 
     if (output_array.rows > 0) {
         face_rect = cv::Rect(
