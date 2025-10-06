@@ -3,65 +3,49 @@
 #include <opencv2/videoio.hpp>
 #include "opencv2/highgui.hpp"
 #include <opencv2/objdetect.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/dnn.hpp>
 #include <chrono>
 #include <vector>
 #include <algorithm>
 #include <queue>
+#include <memory>
 
 const float SEARCH_AREA_SIZE = 1.5f;
 const int SMOOTHING_QUEUE_SIZE = 5;
 
-void detect_face_in_bounds(cv::Rect& face_rect, cv::Mat& grayscale_mat, cv::Rect& search_bounds, cv::CascadeClassifier& face_model) {
+void detect_face_and_eyes_in_bounds(cv::Rect& face_rect, cv::Point& left_eye, cv::Point& right_eye, cv::Mat& full_mat, cv::Rect& search_bounds, std::shared_ptr<cv::FaceDetectorYN>& face_model) {
     /* Detects and gives the first face in the specified bounds.
-       Mat must be already grayscale 
     */
 
-    cv::Mat sub_mat = cv::Mat(grayscale_mat, search_bounds);
+    face_model->setInputSize(search_bounds.size());
 
-    std::vector<cv::Rect> faces;
-    face_model.detectMultiScale(sub_mat, faces);
+    cv::Mat sub_mat = cv::Mat(full_mat, search_bounds);
+    cv::Mat output_array;
 
-    if (faces.size() > 0) {
-        face_rect = faces[0];
-        face_rect.x += search_bounds.x;
-        face_rect.y += search_bounds.y;
+
+    face_model->detect(sub_mat, output_array);
+
+    std::cout << output_array << std::endl;
+
+    if (output_array.rows > 0) {
+        face_rect = cv::Rect(
+            (int)output_array.at<float>(0,0) + search_bounds.x,
+            (int)output_array.at<float>(0,1) + search_bounds.y,
+            (int)output_array.at<float>(0,2),
+            (int)output_array.at<float>(0,3)
+        );
+
+        right_eye = cv::Point(
+            (int)output_array.at<float>(0,4) + search_bounds.x,
+            (int)output_array.at<float>(0,5) + search_bounds.y
+        );
+        left_eye = cv::Point(
+            (int)output_array.at<float>(0,6) + search_bounds.x,
+            (int)output_array.at<float>(0,7) + search_bounds.y
+        );
     } else {
         face_rect = cv::Rect(-1, -1, -1, -1);
-    }
-}
-
-void detect_first_second_object_in_bounds(cv::Rect& first_rect, cv::Rect& second_rect, cv::Mat& grayscale_mat, cv::Rect& search_bounds, cv::CascadeClassifier& detector_model) {
-    /* Detects and gives the two objects in the specified bounds.
-       Gets the objects with the lowest y coordinates first (i.e. higher up)
-       Mat must be already grayscale 
-    */
-
-    cv::Mat sub_mat = cv::Mat(grayscale_mat, search_bounds);
-
-    std::vector<cv::Rect> objects;
-    detector_model.detectMultiScale(sub_mat, objects);
-
-    first_rect = cv::Rect(-1, -1, -1, -1);
-    second_rect = cv::Rect(-1, -1, -1, -1);
-    
-    for (int i=0; i<objects.size(); i++) {
-        if (objects[i].y < first_rect.y || first_rect == cv::Rect(-1, -1, -1, -1)) {
-            second_rect = first_rect;
-            first_rect = objects[i];
-        } else if (objects[i].y < second_rect.y || second_rect == cv::Rect(-1, -1, -1, -1)) {
-            second_rect = objects[i];
-        }
-    }
-
-
-    if (first_rect != cv::Rect(-1, -1, -1, -1)) {
-        first_rect.x += search_bounds.x;
-        first_rect.y += search_bounds.y;
-    }
-
-    if (second_rect != cv::Rect(-1, -1, -1, -1)) {
-        second_rect.x += search_bounds.x;
-        second_rect.y += search_bounds.y;
     }
 }
 
@@ -84,11 +68,10 @@ int main() {
     cv::Rect face_rect; // Output for face detection
     cv::Rect search_bounds; // Initial search bounds
 
-    cv::Rect eye1; // Output for first eye detection
-    cv::Rect eye2; // Output for second eye detection
+    cv::Point left_eye; // Output for left eye detection
+    cv::Point right_eye; // Output for right eye detection
 
     cv::Mat frame; // Current frame from webcam
-    cv::Mat grayscale_frame; // Current frame in grayscale
 
     int no_face_counter = 0; // Counts how many frames in a row no face was detected
                              // Used to reset search bounds if too many frames in a row have no face
@@ -108,17 +91,9 @@ int main() {
     
 
     // Load face model
-    cv::CascadeClassifier face_detector_model;
-    if (!face_detector_model.load("models/face_detector_model.xml")) {
-        std::cerr << "Error: Could not load face model." << std::endl;
-        return -1;
-    }
+    std::shared_ptr<cv::FaceDetectorYN> face_detector = cv::FaceDetectorYN::create("models/face_detector_model.onnx", "", cv::Size(1, 1), 0.9, 0.3, 1);
 
-    cv::CascadeClassifier eye_detector_model;
-    if (!eye_detector_model.load("models/eye_detector_model.xml")) {
-        std::cerr << "Error: Could not load eye model." << std::endl;
-        return -1;
-    }
+    cv::CascadeClassifier face_detector_model;
 
     cv::VideoCapture cap(0); // Open the default camera
     if (!cap.isOpened()) {
@@ -137,6 +112,7 @@ int main() {
        
         
         cap >> frame; // Capture a frame
+
         if (frame.empty()) {
             std::cerr << "Error: Could not capture frame." << std::endl;
             return -1;
@@ -150,13 +126,11 @@ int main() {
 
         cv::rectangle(frame, search_bounds, cv::Scalar(255, 0, 0), 2);
 
-        cv::cvtColor(frame, grayscale_frame, cv::COLOR_BGR2GRAY);
-
         cv::putText(frame, "FPS: " + std::to_string(last_fps) + " Percent time in CV: " + std::to_string(percent_time_in_cv) + "%", cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 2);
 
         
         cv_begin = std::chrono::steady_clock::now();
-        detect_face_in_bounds(face_rect, grayscale_frame, search_bounds, face_detector_model);
+        detect_face_and_eyes_in_bounds(face_rect, left_eye, right_eye, frame, search_bounds, face_detector);
 
         if (face_rect.width != -1) {
             // Face detected
@@ -192,21 +166,10 @@ int main() {
             int x_avg = moving_window_x_sum / last_x_vals.size();
             int y_avg = moving_window_y_sum / last_y_vals.size();
 
-            // Look for eye1 and eye2
+            // Draw left eye, right eye
 
-            cv::Rect eye_search_bounds = cv::Rect(face_rect.x, face_rect.y, face_rect.width, face_rect.height/2);
-            detect_first_second_object_in_bounds(eye1, eye2, grayscale_frame, eye_search_bounds, eye_detector_model);
-
-            if (eye1.width != -1) {
-                cv::circle(frame, cv::Point(eye1.x + eye1.width/2, eye1.y + eye1.height/2), 5, cv::Scalar(0, 0, 255), -1);  
-                cv::rectangle(frame, eye1, cv::Scalar(0, 0, 255), 2);
-            }
-            if (eye2.width != -1) {
-                cv::circle(frame, cv::Point(eye2.x + eye2.width/2, eye2.y + eye2.height/2), 5, cv::Scalar(0, 0, 255), -1);
-                cv::rectangle(frame, eye2, cv::Scalar(0, 0, 255), 2);
-            }
-
-            cv::circle(frame, cv::Point(x_avg, y_avg), 5, cv::Scalar(0, 255, 0), -1);
+            cv::circle(frame, left_eye, 5, cv::Scalar(0, 0, 255), -1);  
+            cv::circle(frame, right_eye, 5, cv::Scalar(0, 0, 255), -1);
 
             no_face_counter = 0; 
         } else {
