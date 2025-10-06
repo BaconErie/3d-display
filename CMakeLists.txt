@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 
 project(3d_display_program)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Find GTK packages
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK REQUIRED gtk4)
