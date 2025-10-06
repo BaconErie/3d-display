@@ -127,6 +127,12 @@ After everything has been set up
 most of the processing occurs, including webcam processing, face detection,
 interlacing algorithms, program
 
+# Dependencies
+
+YuNet Face Detector Model is from the OpenCV Zoo. mi3ku currently uses an older
+version of the model because it uses an older version of OpenCV.
+https://github.com/opencv/opencv_zoo/tree/7e062e54cf5410c09b795ff71b4a255e58498c79/models/face_detection_yunet
+
 # Timeline
 
 - Sep 25 - Oct 9 (2 weeks, at the same time as other tasks): Buy lens sheet
@@ -163,3 +169,7 @@ interlacing algorithms, program
   hyperparameters, or train my own model. There is both face and eye datasets on
   Kaggle and other sites, and I can always augment these datasets by introducing
   noise, rotation, occlusions, and other transformations.
+
+# Future Improvements
+
+- Use a newer version of OpenCV
