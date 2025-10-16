@@ -11,6 +11,9 @@ pkg_check_modules(GTK REQUIRED gtk4)
 # Find OpenCV packages
 find_package(OpenCV REQUIRED)
 
+# Find Boost packages
+find_package(Boost REQUIRED)
+
 # Include GTK directories
 include_directories(${GTK_INCLUDE_DIRS})
 
@@ -63,5 +66,5 @@ add_custom_target(copy_models ALL
 add_dependencies(3d_display_program compile_ui copy_css)
 
 # Link GTK libraries to your executables
-target_link_libraries(3d_display_program ${GTK_LIBRARIES})
-target_link_libraries(cv ${GTK_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(3d_display_program ${GTK_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(cv ${GTK_LIBRARIES} ${OpenCV_LIBS} ${Boost_LIBRARIES})

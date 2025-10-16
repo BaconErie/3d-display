@@ -10,18 +10,25 @@
 #include <algorithm>
 #include <queue>
 #include <memory>
+#include <string>
+#include <thread>
+#include <chrono>
 
 const float SEARCH_AREA_SIZE = 1.5f;
 const int SMOOTHING_QUEUE_SIZE = 5;
 
 
-// Variables that will be shared by all actions
+/** Variables that will be shared by ALL actions
+ *  Do not include variables that are only relevant to main
+ */
 namespace shared_variables {
     cv::VideoCapture cap;
 }
 
-// Data that is used by the face action
-// Declare in global so that we can reuse the values
+
+/** Data that is used by the face action
+ *  Declare in global so that we can reuse the values
+ */
 namespace face_action_variables {
     // Timing variables
     std::chrono::steady_clock::time_point begin;
@@ -163,12 +170,12 @@ void qr_action(cv::Mat output) {
 
 
 /**
- * Sets up variables in all the namespaces, so that they can be used by the 
- * main function and by action functions
+ * Sets up variables in all the namespaces, but only the namespaces,
+ * so that they can be used by the main function and by action functions
  * 
  * Returns anything other than 0 if error.
  */
-int setup() {
+int setup_namespaces() {
     // Load face model
     face_action_variables::face_detector = cv::FaceDetectorYN::create("models/face_detector_model.onnx", "", cv::Size(1, 1), 0.9, 0.3, 1);
 
@@ -183,22 +190,30 @@ int setup() {
 
 
 int main() {
-    // Setup
-    int result = setup();
+    // Setup namespaces
+    int result = setup_namespaces();
     if (result != 0) {
         return result;
     }
 
     // Output frame 
-
     cv::Mat output;
+    
+    std::cout << std::flush;
 
-    face_action(output);
+    std::string line;
 
-    cv::imshow("Window", output);
-    cv::waitKey();
+    while (true) {
+        std::getline(std::cin, line);
 
-
+        if (line == "exit") {
+            return 0;
+        } else if (line == "face") {
+            face_action(output);
+            cv::imwrite("Window.png", output);
+            std::cout << "done\n";
+        }
+    }
 }
 
 /*******************************
