@@ -14,7 +14,7 @@
 #include <thread>
 #include <chrono>
 
-const float SEARCH_AREA_SIZE = 1.5f;
+const float SEARCH_AREA_SIZE = 2.0f;
 const int SMOOTHING_QUEUE_SIZE = 5;
 
 
