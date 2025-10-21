@@ -8,6 +8,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK REQUIRED gtk4)
 
+# Find GLib packages
+pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
+
 # Find OpenCV packages
 find_package(OpenCV REQUIRED)
 
@@ -15,7 +18,7 @@ find_package(OpenCV REQUIRED)
 find_package(Boost REQUIRED)
 
 # Include GTK directories
-include_directories(${GTK_INCLUDE_DIRS})
+include_directories(${GTK_INCLUDE_DIRS}  ${GLIBMM_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 
 # Add compiler flags
 add_compile_options(${GTK_CFLAGS_OTHER})
@@ -63,8 +66,8 @@ add_custom_target(copy_models ALL
 )
 
 # Make sure UI files are copied before building the main executable
-add_dependencies(3d_display_program compile_ui copy_css)
+add_dependencies(3d_display_program compile_ui copy_css copy_models)
 
 # Link GTK libraries to your executables
-target_link_libraries(3d_display_program ${GTK_LIBRARIES} ${Boost_LIBRARIES})
-target_link_libraries(cv ${GTK_LIBRARIES} ${OpenCV_LIBS} ${Boost_LIBRARIES})
+target_link_libraries(3d_display_program ${GTK_LIBRARIES} ${Boost_LIBRARIES} ${OpenCV_LIBS} ${GLIBMM_LIBRARIES})
+target_link_libraries(cv ${GTK_LIBRARIES} ${OpenCV_LIBS} ${Boost_LIBRARIES} ${GLIBMM_LIBRARIES})
