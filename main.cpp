@@ -23,27 +23,15 @@ void request_cv_process_update(void *user_data, Glib::Dispatcher* dispatcher) {
   while (true) {
     // Implementation to request an update from the cv process
     gtk_signal_data* data = static_cast<gtk_signal_data*>(user_data);
-    //std::cout<< "Done casting user_data to gtk_signal_data." << std::endl;
 
-    //std::cout<< "Extracting cv_pipe from data." << std::endl;
     boost::process::opstream* to_cv_pipe = data->to_cv_pipe;
     boost::process::ipstream* from_cv_pipe = data->from_cv_pipe;
-    //std::cout<< "Done extracting cv_pipe from data." << std::endl;
-
-    //std::cout<< "Update webcam image called. " << std::flush;
-
-    //std::cout<< "The status of the pipe is " << to_cv_pipe->good() << std::endl;
-
-    //std::cout<< "Sending face command to cv process." << std::endl;
+    
     *to_cv_pipe << "face" << std::endl;
-    //std::cout<< "Sent face command to cv process." << std::endl;
-
-    //std::cout<< "Currently, the status of the pipe is " << from_cv_pipe->good() << " " << to_cv_pipe->good() << std::endl;
-
+    
     std::string line;
-    //std::cout<< "Reading line from cv process. The line is initially " << line << std::endl;
+    
     std::getline(*from_cv_pipe, line);
-    //std::cout<< "Read line from cv process: " << line << std::endl;
 
     if (line != "done") {
       std::cout<< "Line from cv process was not 'done', it was: " << line << std::endl;
@@ -61,27 +49,13 @@ void update_webcam_image(void *user_data) {
 
   GFile *image_file = g_file_new_for_path("/home/eric/3d-display/programs/program/build/Window.png");
 
-  // //std::cout<< "Here's the uh image file: " << image_file << std::endl;
-  // //std::cout<< "And is that equal to the null pointer? " << (image_file == NULL) << std::endl;
-
-  //std::cout<< "Done creating GFile for the image" << std::endl;
-
-  //std::cout<< "Setting the image file for the main webcam image." << std::endl;
   gtk_picture_set_file(GTK_PICTURE(main_webcam_image), image_file);
-  //std::cout<< "Done setting the image file for the main webcam image." << std::endl;
-
-  //std::cout<< "Here's what's being displayed by the main webcam image: " << gtk_picture_get_file(GTK_PICTURE(main_webcam_image)) << std::endl;
-  //std::cout<< "And is that equal to the null pointer? " << (gtk_picture_get_file(GTK_PICTURE(main_webcam_image)) == NULL) << std::endl;
 
   if (gtk_picture_get_file(GTK_PICTURE(main_webcam_image)) == NULL) {
     std::cout << "Warning: The main webcam image file is NULL!" << std::endl;
   }
 
-  //std::cout<< "Unreferencing the GFile." << std::endl;
   g_object_unref(image_file);
-  //std::cout<< "Done unreferencing the GFile." << std::endl;
-
-  //std::cout<< "End of update_webcam_image.\n\n\n" << std::endl;
 }
 
 void testing_idle_callback() {
