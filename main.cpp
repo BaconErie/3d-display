@@ -47,6 +47,7 @@ void request_cv_process_update(void *user_data, Glib::Dispatcher* dispatcher) {
 
     if (line != "done") {
       std::cout<< "Line from cv process was not 'done', it was: " << line << std::endl;
+      return;
     }
 
     dispatcher->emit();
