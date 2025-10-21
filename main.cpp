@@ -1,4 +1,5 @@
 #include <gtk/gtk.h>
+#include <glibmm.h>
 #include <boost/process.hpp>
 #include <iostream>
 #include <boost/interprocess/shared_memory_object.hpp>
@@ -15,69 +16,71 @@ struct gtk_signal_data {
     bool main_webcam_image_set = false;
     bool fov_webcam_image_set = false;
     bool is_red = false;
+    Glib::Dispatcher *dispatcher;
 };
 
-void update_webcam_image(void *user_data) {
-
+void request_cv_process_update(void *user_data, Glib::Dispatcher* dispatcher) {
   while (true) {
-    std::cout << "In update_webcam_image function." << std::endl;
+    // Implementation to request an update from the cv process
+    gtk_signal_data* data = static_cast<gtk_signal_data*>(user_data);
+    //std::cout<< "Done casting user_data to gtk_signal_data." << std::endl;
 
-  std::cout << "Gonna wait" << std::endl;
-  std::cout << "Done waiting" << std::endl;
+    //std::cout<< "Extracting cv_pipe from data." << std::endl;
+    boost::process::opstream* to_cv_pipe = data->to_cv_pipe;
+    boost::process::ipstream* from_cv_pipe = data->from_cv_pipe;
+    //std::cout<< "Done extracting cv_pipe from data." << std::endl;
 
-  std::cout << "Casting user_data to gtk_signal_data." << std::endl;
-  gtk_signal_data* data = static_cast<gtk_signal_data*>(user_data);
-  std::cout << "Done casting user_data to gtk_signal_data." << std::endl;
+    //std::cout<< "Update webcam image called. " << std::flush;
 
-  std::cout << "Extracting cv_pipe from data." << std::endl;
-  boost::process::opstream* to_cv_pipe = data->to_cv_pipe;
-  boost::process::ipstream* from_cv_pipe = data->from_cv_pipe;
-  std::cout << "Done extracting cv_pipe from data." << std::endl;
+    //std::cout<< "The status of the pipe is " << to_cv_pipe->good() << std::endl;
 
-  std::cout << "Extracting main_webcam_image from data." << std::endl;
-  GtkWidget* main_webcam_image = data->main_webcam_image;
-  std::cout << "Done extracting main_webcam_image from data." << std::endl;
+    //std::cout<< "Sending face command to cv process." << std::endl;
+    *to_cv_pipe << "face" << std::endl;
+    //std::cout<< "Sent face command to cv process." << std::endl;
 
-  std::cout << "Update webcam image called. " << std::flush;
+    //std::cout<< "Currently, the status of the pipe is " << from_cv_pipe->good() << " " << to_cv_pipe->good() << std::endl;
 
-  std::cout << "The status of the pipe is " << to_cv_pipe->good() << std::endl;
+    std::string line;
+    //std::cout<< "Reading line from cv process. The line is initially " << line << std::endl;
+    std::getline(*from_cv_pipe, line);
+    //std::cout<< "Read line from cv process: " << line << std::endl;
 
-  std::cout << "Sending face command to cv process." << std::endl;
-  *to_cv_pipe << "face" << std::endl;
-  std::cout << "Sent face command to cv process." << std::endl;
+    if (line != "done") {
+      std::cout<< "Line from cv process was not 'done', it was: " << line << std::endl;
+    }
 
-  std::cout << "Currently, the status of the pipe is " << from_cv_pipe->good() << " " << to_cv_pipe->good() << std::endl;
-
-  std::string line;
-  std::cout << "Reading line from cv process. The line is initially " << line << std::endl;
-  std::getline(*from_cv_pipe, line);
-  std::cout << "Read line from cv process: " << line << std::endl;
-
-  if (line != "done") {
-    std::cout << "Line from cv process was not 'done', it was: " << line << std::endl;
+    dispatcher->emit();
   }
+}
 
-  std::cout << "Creating a new GFile for the image." << std::endl;
-  
+void update_webcam_image(void *user_data) {  
+
+  gtk_signal_data* data = static_cast<gtk_signal_data*>(user_data);
+  GtkWidget* main_webcam_image = data->main_webcam_image;
 
   GFile *image_file = g_file_new_for_path("/home/eric/3d-display/programs/program/build/Window.png");
 
-  data->is_red = !data->is_red;
-  
-  std::cout << "Done creating GFile for the image" << std::endl;
+  // //std::cout<< "Here's the uh image file: " << image_file << std::endl;
+  // //std::cout<< "And is that equal to the null pointer? " << (image_file == NULL) << std::endl;
 
-  std::cout << "Setting the image file for the main webcam image." << std::endl;
+  //std::cout<< "Done creating GFile for the image" << std::endl;
+
+  //std::cout<< "Setting the image file for the main webcam image." << std::endl;
   gtk_picture_set_file(GTK_PICTURE(main_webcam_image), image_file);
-  std::cout << "Done setting the image file for the main webcam image." << std::endl;
+  //std::cout<< "Done setting the image file for the main webcam image." << std::endl;
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000/30));
+  //std::cout<< "Here's what's being displayed by the main webcam image: " << gtk_picture_get_file(GTK_PICTURE(main_webcam_image)) << std::endl;
+  //std::cout<< "And is that equal to the null pointer? " << (gtk_picture_get_file(GTK_PICTURE(main_webcam_image)) == NULL) << std::endl;
 
-  std::cout << "Unreferencing the GFile." << std::endl;
+  if (gtk_picture_get_file(GTK_PICTURE(main_webcam_image)) == NULL) {
+    std::cout << "Warning: The main webcam image file is NULL!" << std::endl;
+  }
+
+  //std::cout<< "Unreferencing the GFile." << std::endl;
   g_object_unref(image_file);
-  std::cout << "Done unreferencing the GFile." << std::endl;
+  //std::cout<< "Done unreferencing the GFile." << std::endl;
 
-  std::cout << "End of update_webcam_image.\n\n\n" << std::endl;
-  }  
+  //std::cout<< "End of update_webcam_image.\n\n\n" << std::endl;
 }
 
 void testing_idle_callback() {
@@ -194,7 +197,23 @@ activate (GtkApplication *app,
   std::cout << "Idle adding the update webcam image" << from_cv_pipe.good() << std::endl;
 
   // Using C++ threading
-  std::thread webcam_update_thread(update_webcam_image, user_data);
+  Glib::Dispatcher *dispatcher = data->dispatcher;
+
+  std::cout << "Getting the dispatcher" << std::endl;
+
+  dispatcher->connect([user_data]() {
+      update_webcam_image(user_data);
+  });
+
+  std::cout << "Connected dispatcher" << std::endl;
+
+  std::cout << "Trying to create the thread" << std::endl;
+
+  std::thread webcam_update_thread(request_cv_process_update, user_data, dispatcher);
+
+  std::cout << "Done creating thread" << std::endl;
+  std::cout << "Detaching thread" << std::endl;
+
   webcam_update_thread.detach();
 
   std::cout << "Done creating the thread" << std::endl;
@@ -241,6 +260,7 @@ main (int    argc,
   boost::process::opstream to_cv_pipe;
   boost::process::ipstream from_cv_pipe;
   boost::interprocess::shared_memory_object shared_memory;
+  Glib::Dispatcher dispatcher;
 
   gtk_signal_data data_for_gtk_signals;
 
@@ -255,6 +275,7 @@ main (int    argc,
   data_for_gtk_signals.to_cv_pipe = &to_cv_pipe;
   data_for_gtk_signals.from_cv_pipe = &from_cv_pipe;
   data_for_gtk_signals.shared_memory = &shared_memory;
+  data_for_gtk_signals.dispatcher = &dispatcher;
 
   int status;
 
