@@ -18,17 +18,23 @@ find_package(OpenCV REQUIRED)
 find_package(Boost REQUIRED)
 
 # Include GTK directories
-include_directories(${GTK_INCLUDE_DIRS}  ${GLIBMM_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
+include_directories(
+    ${GTK_INCLUDE_DIRS}
+    ${GLIBMM_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS}
+    ${CMAKE_SOURCE_DIR}/include
+)
 
 # Add compiler flags
 add_compile_options(${GTK_CFLAGS_OTHER})
 
 # Create executables
-add_executable(3d_display_program src/main.cpp)
+add_executable(3d_display_program 
+    src/main.cpp
+    src/event_handlers.cpp
+)
 add_executable(cv src/cv.cpp)
-
-target_include_directories(3d_display_program PRIVATE include)
-target_include_directories(cv PRIVATE include)
 
 # Check if Blueprint compiler is installed.
 
