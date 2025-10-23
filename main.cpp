@@ -195,14 +195,20 @@ void update_webcam_image(void *user_data) {
 
   gtk_signal_data* data = static_cast<gtk_signal_data*>(user_data);
   GtkWidget* main_webcam_image = data->main_webcam_image;
+  GtkWidget* fov_webcam_image = data->fov_webcam_image;
 
   GFile *image_file = g_file_new_for_path("/home/eric/3d-display/programs/program/build/Window.png");
 
   gtk_picture_set_file(GTK_PICTURE(main_webcam_image), image_file);
+  gtk_picture_set_file(GTK_PICTURE(fov_webcam_image), image_file);
 
   if (gtk_picture_get_file(GTK_PICTURE(main_webcam_image)) == NULL) {
     std::cout << "Warning: The main webcam image file is NULL!" << std::endl;
   }
+  if (gtk_picture_get_file(GTK_PICTURE(fov_webcam_image)) == NULL) {
+    std::cout << "Warning: The FOV webcam image file is NULL!" << std::endl;
+  }
+
 
   g_object_unref(image_file);
 }
