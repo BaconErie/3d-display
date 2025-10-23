@@ -24,9 +24,11 @@ include_directories(${GTK_INCLUDE_DIRS}  ${GLIBMM_INCLUDE_DIRS} ${Boost_INCLUDE_
 add_compile_options(${GTK_CFLAGS_OTHER})
 
 # Create executables
-add_executable(3d_display_program main.cpp)
-add_executable(cv cv.cpp)
+add_executable(3d_display_program src/main.cpp)
+add_executable(cv src/cv.cpp)
 
+target_include_directories(3d_display_program PRIVATE include)
+target_include_directories(cv PRIVATE include)
 
 # Check if Blueprint compiler is installed.
 
