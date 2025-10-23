@@ -127,8 +127,8 @@ interlacing algorithms, program
 
 # Dependencies
 
-YuNet Face Detector Model is from the OpenCV Zoo. mi3ku currently uses an older
-version of the model because it uses an older version of OpenCV.
+YuNet Face Detector Model is from the OpenCV Zoo. This project currently uses an
+older version of the model because it uses an older version of OpenCV.
 https://github.com/opencv/opencv_zoo/tree/7e062e54cf5410c09b795ff71b4a255e58498c79/models/face_detection_yunet
 
 # Timeline
