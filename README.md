@@ -1,9 +1,7 @@
-# mi`3`ku
+# 3D Display
 
-mi3ku (pronounced MEE-ku) is a system of programs and hardware that allows you
-to convert any LCD display into a 3D display, for less than 50 bucks.
-
-mi3ku stands for the "Modular Immersive 3D Konversion Unit (for displays)".
+System of programs and hardware that allows you to convert any LCD display into
+a 3D display for less than 50 bucks.
 
 It is designed to be easy to set up and easy to use. There is a 5 step
 calibration process, which may take half an hour, but calibration steps are
