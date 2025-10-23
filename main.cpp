@@ -17,7 +17,156 @@ struct gtk_signal_data {
     bool fov_webcam_image_set = false;
     bool is_red = false;
     Glib::Dispatcher *dispatcher;
+    GtkWidget *stack_widget;
+    GtkBuilder *builder;
+
+    GtkEditable *qr_code_distance_editable;
+    GtkEditable *lenticule_density_editable;
+    GtkEditable *green_red_line_distance_editable;
+    GtkEditable *horizontal_displacement_editable;
+    GtkEditable *vertical_displacement_editable;
 };
+
+static void on_calibrate_button_clicked (GtkWidget *widget, gpointer data);
+static void on_fov_calibration_capture_clicked(GtkWidget *widget, gpointer data);
+static void on_display_density_continue_clicked(GtkWidget *widget, gpointer data);
+static void on_horizontal_displacement_continue_clicked(GtkWidget *widget, gpointer data);
+static void on_vertical_displacement_continue_clicked(GtkWidget *widget, gpointer data);
+static void on_measurements_continue_clicked(GtkWidget *widget, gpointer data);
+
+static void on_calibrate_button_clicked (GtkWidget *widget, gpointer data)
+{
+  gtk_signal_data* signal_data = static_cast<gtk_signal_data*>(data);
+  GtkWidget* stack_widget = signal_data->stack_widget;
+  GtkBuilder *builder = static_cast<gtk_signal_data*>(data)->builder;
+
+  // Switch to the calibration stack first
+  gtk_stack_set_visible_child_name(GTK_STACK(stack_widget), "fov_calibration_box");
+}
+
+static void on_fov_calibration_capture_clicked(GtkWidget *widget, gpointer data)
+{
+  gtk_signal_data* signal_data = static_cast<gtk_signal_data*>(data);
+  GtkWidget* stack_widget = signal_data->stack_widget;
+
+  // Switch to the display density calibration stack page
+  gtk_stack_set_visible_child_name(GTK_STACK(stack_widget), "measurements_calibration_box");
+}
+
+static void on_measurements_continue_clicked(GtkWidget *widget, gpointer data)
+{
+
+  gtk_signal_data* signal_data = static_cast<gtk_signal_data*>(data);
+  GtkWidget* stack_widget = signal_data->stack_widget;
+
+  std::string qr_code_distance_input(gtk_editable_get_chars(signal_data->qr_code_distance_editable, 0, -1));
+  float qr_code_distance = 0.0; 
+  bool was_parse_successful = false;
+
+  try {
+    qr_code_distance = std::stof(qr_code_distance_input);
+    was_parse_successful = true;
+  } catch (const std::invalid_argument& e) {
+    std::cerr << "Invalid input for QR code distance: " << e.what() << std::endl;
+  }
+
+  if (!was_parse_successful) return;
+
+  // Get the lenticule density
+
+  std::string lenticule_density_input(gtk_editable_get_chars(signal_data->lenticule_density_editable, 0, -1));
+  float lenticule_density = 0.0; 
+  was_parse_successful = false;
+
+  try {
+    lenticule_density = std::stof(lenticule_density_input);
+    was_parse_successful = true;
+  } catch (const std::invalid_argument& e) {
+    std::cerr << "Invalid input for lenticule density: " << e.what() << std::endl;
+  }
+
+  if (!was_parse_successful) return;
+
+  std::cout << "QR Code distance: " << qr_code_distance << " in." << std::endl;
+  std::cout << "Lenticule density: " << lenticule_density << " LPI" << std::endl;
+
+  // Switch back to the main calibration stack
+  gtk_stack_set_visible_child_name(GTK_STACK(stack_widget), "display_density_calibration_box");
+}
+
+static void on_display_density_continue_clicked(GtkWidget *widget, gpointer data)
+{
+  gtk_signal_data* signal_data = static_cast<gtk_signal_data*>(data);
+  GtkWidget* stack_widget = signal_data->stack_widget;
+
+  std::string green_to_red_line_distance_input(gtk_editable_get_chars(signal_data->green_red_line_distance_editable, 0, -1));
+  float green_to_red_line_distance = 0.0; 
+  bool was_parse_successful = false;
+
+  try {
+    green_to_red_line_distance = std::stof(green_to_red_line_distance_input);
+    was_parse_successful = true;
+  } catch (const std::invalid_argument& e) {
+    std::cerr << "Invalid input for green to red line distance: " << e.what() << std::endl;
+  }
+
+  if (!was_parse_successful) return;
+
+  std::cout << "Distance from green to the red line: " << green_to_red_line_distance << " in." << std::endl;
+
+  // Switch to the horizontal displacement calibration stack
+  gtk_stack_set_visible_child_name(GTK_STACK(stack_widget), "horizontal_displacement_calibration_box");
+}
+
+static void on_horizontal_displacement_continue_clicked(GtkWidget *widget, gpointer data)
+{
+
+  gtk_signal_data* signal_data = static_cast<gtk_signal_data*>(data);
+  GtkWidget* stack_widget = signal_data->stack_widget;
+
+  std::string horizontal_displacement_input(gtk_editable_get_chars(signal_data->horizontal_displacement_editable, 0, -1));
+  float horizontal_displacement = 0.0; 
+  bool was_parse_successful = false;
+
+  try {
+    horizontal_displacement = std::stof(horizontal_displacement_input);
+    was_parse_successful = true;
+  } catch (const std::invalid_argument& e) {
+    std::cerr << "Invalid input for horizontal displacement: " << e.what() << std::endl;
+  }
+
+  if (!was_parse_successful) return;
+
+  std::cout << "Horizontal displacement: " << horizontal_displacement << " in." << std::endl;
+
+  // Switch to the vertical displacement calibration stack
+  gtk_stack_set_visible_child_name(GTK_STACK(stack_widget), "vertical_displacement_calibration_box");
+}
+
+static void on_vertical_displacement_continue_clicked(GtkWidget *widget, gpointer data)
+{
+
+  gtk_signal_data* signal_data = static_cast<gtk_signal_data*>(data);
+  GtkWidget* stack_widget = signal_data->stack_widget;
+
+  std::string vertical_displacement_input(gtk_editable_get_chars(signal_data->vertical_displacement_editable, 0, -1));
+  float vertical_displacement = 0.0; 
+  bool was_parse_successful = false;
+
+  try {
+    vertical_displacement = std::stof(vertical_displacement_input);
+    was_parse_successful = true;
+  } catch (const std::invalid_argument& e) {
+    std::cerr << "Invalid input for vertical displacement: " << e.what() << std::endl;
+  }
+
+  if (!was_parse_successful) return;
+
+  std::cout << "Vertical displacement: " << vertical_displacement << " in." << std::endl;
+
+  // Switch to the measurements calibration stack
+  gtk_stack_set_visible_child_name(GTK_STACK(stack_widget), "main_box");
+}
 
 void request_cv_process_update(void *user_data, Glib::Dispatcher* dispatcher) {
   while (true) {
@@ -58,10 +207,6 @@ void update_webcam_image(void *user_data) {
   g_object_unref(image_file);
 }
 
-void testing_idle_callback() {
-    std::cout << "Idle callback triggered!" << std::endl;
-}
-
 // Signal handler for the button click
 static void
 on_hello_button_clicked (GtkWidget *widget,
@@ -95,7 +240,8 @@ activate (GtkApplication *app,
   GtkWidget *main_webcam_image = data->main_webcam_image;
   GtkWidget *fov_webcam_image = data->fov_webcam_image;
 
-  std::cout << "Starting cv process..." << std::endl;
+  data->builder = builder;
+
   cv_process = boost::process::child(
     "./cv", 
     boost::process::std_out > from_cv_pipe, 
@@ -106,10 +252,8 @@ activate (GtkApplication *app,
     std::cerr << "Error: Could not start cv process." << std::endl;
     return;
   }
-  std::cout << "Done starting." << std::endl;
 
   to_cv_pipe << "face" << std::endl;
-  std::cout << "OK THIS IS THE STATUS OF CV_PIPE " << from_cv_pipe.good() << std::endl;
 
   // Set up the shared memory
   boost::interprocess::shared_memory_object& shm_obj = *(data->shared_memory);
@@ -169,29 +313,18 @@ activate (GtkApplication *app,
     g_warning("Could not find Main webcam image widget");
   }
 
-  std::cout << "Idle adding the update webcam image" << from_cv_pipe.good() << std::endl;
+
 
   // Using C++ threading
   Glib::Dispatcher *dispatcher = data->dispatcher;
-
-  std::cout << "Getting the dispatcher" << std::endl;
 
   dispatcher->connect([user_data]() {
       update_webcam_image(user_data);
   });
 
-  std::cout << "Connected dispatcher" << std::endl;
-
-  std::cout << "Trying to create the thread" << std::endl;
-
   std::thread webcam_update_thread(request_cv_process_update, user_data, dispatcher);
 
-  std::cout << "Done creating thread" << std::endl;
-  std::cout << "Detaching thread" << std::endl;
-
   webcam_update_thread.detach();
-
-  std::cout << "Done creating the thread" << std::endl;
 
   // // Using GTK idle add to periodically update the webcam image
   // g_idle_add(G_SOURCE_FUNC(update_webcam_image), user_data);
@@ -205,21 +338,40 @@ activate (GtkApplication *app,
                                             GTK_STYLE_PROVIDER(css_provider),
                                             GTK_STYLE_PROVIDER_PRIORITY_USER);
 
+  // Set the stack pointer
+  data->stack_widget = GTK_WIDGET(gtk_builder_get_object(builder, "main_stack"));
+
+  // Connect signal for buttons
+  GtkWidget *calibrate_button = GTK_WIDGET(gtk_builder_get_object(builder, "calibrate_button"));
+  GtkWidget *fov_calibration_capture_button = GTK_WIDGET(gtk_builder_get_object(builder, "fov_calibration_capture_button"));
+  GtkWidget *display_density_continue_button = GTK_WIDGET(gtk_builder_get_object(builder, "display_density_continue_button"));
+  GtkWidget *horizontal_displacement_continue_button = GTK_WIDGET(gtk_builder_get_object(builder, "horizontal_displacement_continue_button"));
+  GtkWidget *vertical_displacement_continue_button = GTK_WIDGET(gtk_builder_get_object(builder, "vertical_displacement_continue_button"));
+  GtkWidget *measurements_continue_button = GTK_WIDGET(gtk_builder_get_object(builder, "measurements_continue_button"));
+
+  g_signal_connect(calibrate_button, "clicked", G_CALLBACK(on_calibrate_button_clicked), user_data);
+  g_signal_connect(fov_calibration_capture_button, "clicked", G_CALLBACK(on_fov_calibration_capture_clicked), user_data);
+  g_signal_connect(display_density_continue_button, "clicked", G_CALLBACK(on_display_density_continue_clicked), user_data);
+  g_signal_connect(horizontal_displacement_continue_button, "clicked", G_CALLBACK(on_horizontal_displacement_continue_clicked), user_data);
+  g_signal_connect(vertical_displacement_continue_button, "clicked", G_CALLBACK(on_vertical_displacement_continue_clicked), user_data);
+  g_signal_connect(measurements_continue_button, "clicked", G_CALLBACK(on_measurements_continue_clicked), user_data);
+
+  // Set up the entry pointers
+  data->qr_code_distance_editable = GTK_EDITABLE(gtk_builder_get_object(builder, "qr_code_distance_entry"));
+  data->lenticule_density_editable = GTK_EDITABLE(gtk_builder_get_object(builder, "lenticule_density_entry"));
+  data->green_red_line_distance_editable = GTK_EDITABLE(gtk_builder_get_object(builder, "green_red_line_distance_entry"));
+  data->horizontal_displacement_editable = GTK_EDITABLE(gtk_builder_get_object(builder, "horizontal_displacement_entry"));
+  data->vertical_displacement_editable = GTK_EDITABLE(gtk_builder_get_object(builder, "vertical_displacement_entry"));
+
+
   // Show the window
-  std::cout << "Showing window" << std::endl;
-  std::cout << cv_process.id() << std::endl;
-  std::cout << cv_process.running() << std::endl;
+
   gtk_window_present (GTK_WINDOW (window));
-  std::cout << "Done showing window" << std::endl;
 
-  // Clean up
-  g_object_unref (builder);
+  // Don't clean up builder
+  // // Clean up 
+  // g_object_unref (builder);
 
-  std::cout << "Clean up." << std::endl;
-  std::cout << cv_process.id() << std::endl;
-  std::cout << cv_process.running() << std::endl;
-
-  std::cout << "OK THIS IS THE STATUS OF CV_PIPE AT THE END OF THING " << to_cv_pipe.good() << std::endl;
 }
 
 static void deactivate(GtkApplication *app, void *data) {
@@ -242,10 +394,6 @@ main (int    argc,
   GMainLoop *main_loop;
   main_loop = g_main_loop_new(NULL, FALSE);
 
-  //g_source_new();
-
-  std::cout << "Done with idle add." << std::endl;
-
   data_for_gtk_signals.cv_process = &cv_process;
   data_for_gtk_signals.to_cv_pipe = &to_cv_pipe;
   data_for_gtk_signals.from_cv_pipe = &from_cv_pipe;
@@ -257,13 +405,11 @@ main (int    argc,
   app = gtk_application_new ("org.gtk.example", G_APPLICATION_DEFAULT_FLAGS);
   g_signal_connect (app, "activate", G_CALLBACK (activate), &data_for_gtk_signals);
   g_signal_connect (app, "shutdown", G_CALLBACK (deactivate), &data_for_gtk_signals);
-  std::cout << "Done with signal connect." << std::endl;
 
   // GFile *image_file = g_file_new_for_path("/home/eric/3d-display/programs/program/build/Window.png");
   // gtk_picture_set_file(GTK_PICTURE(data_for_gtk_signals.main_webcam_image), image_file);
 
   status = g_application_run (G_APPLICATION (app), argc, argv);
-  std::cout << "Done running application." << std::endl;
   g_object_unref (app);
 
   return status;

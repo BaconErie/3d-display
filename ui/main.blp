@@ -87,6 +87,7 @@ Box main_box {
                 }
 
                 Button calibrate_button {
+                    name: "calibrate_button";
                     label: "Calibrate";
                     hexpand: true;
                 }
@@ -122,7 +123,8 @@ Box fov_calibration_box {
         Picture fov_webcam_image { 
         }
 
-        Button {
+        Button fov_calibration_capture_button{
+            name: "fov_calibration_capture_button";
             label: "Capture";
         }
     }
@@ -164,7 +166,7 @@ Box measurements_calibration_box {
                 label: "QR code distance: ";
             }
 
-            Entry {
+            Entry qr_code_distance_entry {
                 placeholder-text: "Value in inches";
             }
 
@@ -186,7 +188,7 @@ Box measurements_calibration_box {
                 label: "Lenticule density: ";
             }
 
-            Entry {
+            Entry lenticule_density_entry {
                 placeholder-text: "Value in LPI";
             }
 
@@ -196,7 +198,7 @@ Box measurements_calibration_box {
 
         }
 
-        Button {
+        Button measurements_continue_button {
             margin-top: 10;
             halign: start;
             label: "Continue";
@@ -239,7 +241,7 @@ Box display_density_calibration_box {
                 label: "Distance from green line to red line: ";
             }
 
-            Entry {
+            Entry green_red_line_distance_entry {
                 placeholder-text: "Value in inches";
             }
 
@@ -249,7 +251,7 @@ Box display_density_calibration_box {
 
         }
 
-        Button {
+        Button display_density_continue_button {
             label: "Continue";
             halign: start;
         }
@@ -291,7 +293,7 @@ Box horizontal_displacement_calibration_box {
                 label: "Distance from green line to red line: ";
             }
 
-            Entry {
+            Entry horizontal_displacement_entry {
                 placeholder-text: "Value in inches";
             }
 
@@ -301,7 +303,7 @@ Box horizontal_displacement_calibration_box {
 
         }
 
-        Button {
+        Button horizontal_displacement_continue_button {
             label: "Continue";
             halign: start;
         }
@@ -346,7 +348,7 @@ Box vertical_displacement_calibration_box {
                 label: "Vertical displacement: ";
             }
 
-            Entry {
+            Entry vertical_displacement_entry {
                 placeholder-text: "Value in inches";
             }
 
@@ -356,7 +358,7 @@ Box vertical_displacement_calibration_box {
 
         }
 
-        Button {
+        Button vertical_displacement_continue_button {
             label: "Continue";
             halign: start;
         }
@@ -371,10 +373,11 @@ Window main_window {
     default-width: 200;
     default-height: 200;
 
-    Stack {
+    Stack main_stack {
+        name: "main_stack";
             
         StackPage {
-            name: "main_page";
+            name: "main_box";
             title: "Main Menu";
             child: main_box;
         }        
