@@ -1,6 +1,6 @@
 #include "event_handlers.hpp"
 
-void on_calibrate_button_clicked (GtkWidget *widget, gpointer data)
+void event_handlers::on_calibrate_button_clicked (GtkWidget *widget, gpointer data)
 {
   gtk_signal_data* signal_data = static_cast<gtk_signal_data*>(data);
   GtkWidget* stack_widget = signal_data->stack_widget;
@@ -10,7 +10,7 @@ void on_calibrate_button_clicked (GtkWidget *widget, gpointer data)
   gtk_stack_set_visible_child_name(GTK_STACK(stack_widget), "fov_calibration_box");
 }
 
-void on_fov_calibration_capture_clicked(GtkWidget *widget, gpointer data)
+void event_handlers::on_fov_calibration_capture_clicked(GtkWidget *widget, gpointer data)
 {
   gtk_signal_data* signal_data = static_cast<gtk_signal_data*>(data);
   GtkWidget* stack_widget = signal_data->stack_widget;
@@ -19,7 +19,7 @@ void on_fov_calibration_capture_clicked(GtkWidget *widget, gpointer data)
   gtk_stack_set_visible_child_name(GTK_STACK(stack_widget), "measurements_calibration_box");
 }
 
-void on_measurements_continue_clicked(GtkWidget *widget, gpointer data)
+void event_handlers::on_measurements_continue_clicked(GtkWidget *widget, gpointer data)
 {
 
   gtk_signal_data* signal_data = static_cast<gtk_signal_data*>(data);
@@ -60,7 +60,7 @@ void on_measurements_continue_clicked(GtkWidget *widget, gpointer data)
   gtk_stack_set_visible_child_name(GTK_STACK(stack_widget), "display_density_calibration_box");
 }
 
-void on_display_density_continue_clicked(GtkWidget *widget, gpointer data)
+void event_handlers::on_display_density_continue_clicked(GtkWidget *widget, gpointer data)
 {
   gtk_signal_data* signal_data = static_cast<gtk_signal_data*>(data);
   GtkWidget* stack_widget = signal_data->stack_widget;
@@ -84,7 +84,7 @@ void on_display_density_continue_clicked(GtkWidget *widget, gpointer data)
   gtk_stack_set_visible_child_name(GTK_STACK(stack_widget), "horizontal_displacement_calibration_box");
 }
 
-void on_horizontal_displacement_continue_clicked(GtkWidget *widget, gpointer data)
+void event_handlers::on_horizontal_displacement_continue_clicked(GtkWidget *widget, gpointer data)
 {
 
   gtk_signal_data* signal_data = static_cast<gtk_signal_data*>(data);
@@ -109,7 +109,7 @@ void on_horizontal_displacement_continue_clicked(GtkWidget *widget, gpointer dat
   gtk_stack_set_visible_child_name(GTK_STACK(stack_widget), "vertical_displacement_calibration_box");
 }
 
-void on_vertical_displacement_continue_clicked(GtkWidget *widget, gpointer data)
+void event_handlers::on_vertical_displacement_continue_clicked(GtkWidget *widget, gpointer data)
 {
 
   gtk_signal_data* signal_data = static_cast<gtk_signal_data*>(data);

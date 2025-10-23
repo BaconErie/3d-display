@@ -191,12 +191,12 @@ activate (GtkApplication *app,
   GtkWidget *vertical_displacement_continue_button = GTK_WIDGET(gtk_builder_get_object(builder, "vertical_displacement_continue_button"));
   GtkWidget *measurements_continue_button = GTK_WIDGET(gtk_builder_get_object(builder, "measurements_continue_button"));
 
-  g_signal_connect(calibrate_button, "clicked", G_CALLBACK(on_calibrate_button_clicked), user_data);
-  g_signal_connect(fov_calibration_capture_button, "clicked", G_CALLBACK(on_fov_calibration_capture_clicked), user_data);
-  g_signal_connect(display_density_continue_button, "clicked", G_CALLBACK(on_display_density_continue_clicked), user_data);
-  g_signal_connect(horizontal_displacement_continue_button, "clicked", G_CALLBACK(on_horizontal_displacement_continue_clicked), user_data);
-  g_signal_connect(vertical_displacement_continue_button, "clicked", G_CALLBACK(on_vertical_displacement_continue_clicked), user_data);
-  g_signal_connect(measurements_continue_button, "clicked", G_CALLBACK(on_measurements_continue_clicked), user_data);
+  g_signal_connect(calibrate_button, "clicked", G_CALLBACK(event_handlers::on_calibrate_button_clicked), user_data);
+  g_signal_connect(fov_calibration_capture_button, "clicked", G_CALLBACK(event_handlers::on_fov_calibration_capture_clicked), user_data);
+  g_signal_connect(display_density_continue_button, "clicked", G_CALLBACK(event_handlers::on_display_density_continue_clicked), user_data);
+  g_signal_connect(horizontal_displacement_continue_button, "clicked", G_CALLBACK(event_handlers::on_horizontal_displacement_continue_clicked), user_data);
+  g_signal_connect(vertical_displacement_continue_button, "clicked", G_CALLBACK(event_handlers::on_vertical_displacement_continue_clicked), user_data);
+  g_signal_connect(measurements_continue_button, "clicked", G_CALLBACK(event_handlers::on_measurements_continue_clicked), user_data);
 
   // Set up the entry pointers
   data->qr_code_distance_editable = GTK_EDITABLE(gtk_builder_get_object(builder, "qr_code_distance_entry"));
