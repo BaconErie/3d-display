@@ -10,6 +10,35 @@
 #include "cv_actions.hpp"
 #include "event_handlers.hpp"
 
+GdkPaintable* webcam_paintable;
+std::mutex webcam_paintable_mutex;
+
+GdkPaintable* cv_mat_to_paintable(const cv::Mat& mat) {
+    cv::Mat rgb_mat;
+    
+    // Convert BGR to RGB (OpenCV uses BGR, GTK expects RGB)
+    cv::cvtColor(mat, rgb_mat, cv::COLOR_BGR2RGB);
+    
+    // Create GBytes from cv::Mat data
+    GBytes* bytes = g_bytes_new(rgb_mat.data, rgb_mat.total() * rgb_mat.elemSize());
+    
+    // Create GdkTexture from bytes
+    GdkTexture* texture = gdk_memory_texture_new(
+        rgb_mat.cols,              // width
+        rgb_mat.rows,              // height
+        GDK_MEMORY_R8G8B8,         // format (RGB, 8 bits per channel)
+        bytes,                     // data
+        rgb_mat.step[0]            // stride
+    );
+
+    GdkPaintable *paintable = GDK_PAINTABLE(texture);
+
+    g_bytes_unref(bytes);
+    g_object_unref(texture);
+
+    return paintable;
+}
+
 void request_cv_process_update(void *user_data, Glib::Dispatcher* dispatcher) {
   while (true) {
     // Implementation to request an update from the cv process
