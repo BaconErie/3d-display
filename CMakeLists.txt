@@ -33,8 +33,8 @@ add_compile_options(${GTK_CFLAGS_OTHER})
 add_executable(3d_display_program 
     src/main.cpp
     src/event_handlers.cpp
+    src/cv_actions.cpp
 )
-add_executable(cv src/cv.cpp)
 
 # Check if Blueprint compiler is installed.
 
@@ -78,4 +78,3 @@ add_dependencies(3d_display_program compile_ui copy_css copy_models)
 
 # Link GTK libraries to your executables
 target_link_libraries(3d_display_program ${GTK_LIBRARIES} ${Boost_LIBRARIES} ${OpenCV_LIBS} ${GLIBMM_LIBRARIES})
-target_link_libraries(cv ${GTK_LIBRARIES} ${OpenCV_LIBS} ${Boost_LIBRARIES} ${GLIBMM_LIBRARIES})
