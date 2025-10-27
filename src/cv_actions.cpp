@@ -1,4 +1,4 @@
-#include "cv.hpp"
+#include "cv_actions.hpp"
 
 bool cv_actions::detect_face(cv::FaceDetectorYN& face_model, cv::Rect search_bounds, cv::Mat& out_frame, cv::Point& left_eye_position, cv::Point& right_eye_position) {
     if (search_bounds.width < 63 || search_bounds.height < 63) {

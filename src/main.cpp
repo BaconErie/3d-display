@@ -1,12 +1,13 @@
 #include <gtk/gtk.h>
 #include <glibmm.h>
 
-#include "gtk_signal_data.hpp"
-
 #include <boost/process.hpp>
 #include <iostream>
 #include <thread>
 #include <chrono>
+
+#include "gtk_signal_data.hpp"
+#include "cv_actions.hpp"
 #include "event_handlers.hpp"
 
 void request_cv_process_update(void *user_data, Glib::Dispatcher* dispatcher) {
