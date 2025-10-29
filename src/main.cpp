@@ -39,27 +39,31 @@ GdkPaintable* cv_mat_to_paintable(const cv::Mat& mat) {
     return paintable;
 }
 
-void request_cv_process_update(void *user_data, Glib::Dispatcher* dispatcher) {
-  while (true) {
-    // Implementation to request an update from the cv process
-    gtk_signal_data* data = static_cast<gtk_signal_data*>(user_data);
+void request_cv_process_update(Glib::Dispatcher* dispatcher) {
+    while (true) {
+        // Run action
+        cv::Mat output;
+        cv::Point left_eye, right_eye;
+        cv_actions::detect_face(*face_detector, bounding_box, webcam_capture, output, left_eye, right_eye);
 
-    boost::process::opstream* to_cv_pipe = data->to_cv_pipe;
-    boost::process::ipstream* from_cv_pipe = data->from_cv_pipe;
-    
-    *to_cv_pipe << "face" << std::endl;
-    
-    std::string line;
-    
-    std::getline(*from_cv_pipe, line);
+        // Convert to GdkPaintable
+        GdkPaintable* new_paintable = cv_mat_to_paintable(output);
 
-    if (line != "done") {
-      std::cout<< "Line from cv process was not 'done', it was: " << line << std::endl;
-      return;
+        // Lock the mutex
+        webcam_paintable_mutex.lock();
+        if (webcam_paintable) {
+          g_object_unref(webcam_paintable);
+        }
+
+        // Update the shared paintable
+        webcam_paintable = new_paintable;
+
+        // Unlock mutex
+        webcam_paintable_mutex.unlock();
+        
+        // Notify the main thread to update the UI
+        dispatcher->emit();
     }
-
-    dispatcher->emit();
-  }
 }
 
 void update_webcam_image(void *user_data) {  
