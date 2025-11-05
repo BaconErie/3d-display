@@ -3,6 +3,7 @@
 #include <gtk/gtk.h>
 #include "gtk_signal_data.hpp"
 #include <iostream>
+#include "shared.hpp"
 
 
 namespace event_handlers {
