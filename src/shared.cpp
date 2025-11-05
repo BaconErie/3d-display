@@ -19,10 +19,14 @@ namespace shared {
     GtkEditable* green_red_line_distance_editable = nullptr;
     GtkEditable* horizontal_displacement_editable = nullptr;
     GtkEditable* vertical_displacement_editable = nullptr;
+
+    bool is_current_cv_action_face = true;
 }
 
 namespace parameters {
     float qr_code_distance = 0;
+    float qr_code_inverse_proportion = 0;
+    float webcam_fov_deg = 0;
     float lenticule_density = 0;
     float green_to_red_line_distance = 0;
     float horizontal_displacement = 0;

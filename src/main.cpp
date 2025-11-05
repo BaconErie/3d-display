@@ -38,10 +38,17 @@ GdkPaintable* cv_mat_to_paintable(const cv::Mat& mat) {
 
 void request_cv_process_update() {
     while (true) {
-        // Run action
+
         cv::Mat output;
-        cv::Point left_eye, right_eye;
-        cv_actions::detect_face(shared::face_detector_pointer, shared::bounding_box, shared::webcam_capture, output, left_eye, right_eye);
+
+        if (!shared::is_current_cv_action_face) { 
+            // Do QR Code
+            cv_actions::detect_qr(shared::webcam_capture, output, parameters::qr_code_inverse_proportion);
+        } else {
+            // Run action
+            cv::Point left_eye, right_eye;
+            cv_actions::detect_face(shared::face_detector_pointer, shared::bounding_box, shared::webcam_capture, output, left_eye, right_eye);
+        }
 
         // Convert to GdkPaintable
         GdkPaintable* new_paintable = cv_mat_to_paintable(output);
@@ -49,7 +56,7 @@ void request_cv_process_update() {
         // Lock the mutex
         shared::webcam_paintable_mutex.lock();
         if (shared::webcam_paintable) {
-          g_object_unref(shared::webcam_paintable);
+        g_object_unref(shared::webcam_paintable);
         }
 
         // Update the shared paintable

@@ -3,12 +3,14 @@
 void event_handlers::on_calibrate_button_clicked (GtkWidget *widget, gpointer _)
 {
   // Switch to the calibration stack first
+  shared::is_current_cv_action_face = false;
   gtk_stack_set_visible_child_name(shared::stack_widget, "fov_calibration_box");
 }
 
 void event_handlers::on_fov_calibration_capture_clicked(GtkWidget *widget, gpointer _)
 {
   gtk_stack_set_visible_child_name(shared::stack_widget, "measurements_calibration_box");
+  shared::is_current_cv_action_face = true;
 }
 
 void event_handlers::on_measurements_continue_clicked(GtkWidget *widget, gpointer _)
@@ -41,7 +43,11 @@ void event_handlers::on_measurements_continue_clicked(GtkWidget *widget, gpointe
 
   if (!was_parse_successful) return;
 
+  float qr_code_angular_size = std::atan2(QR_CODE_WIDTH/2, parameters::qr_code_distance) * 2 *(180.0/3.141592653589793238463);
+  parameters::webcam_fov_deg = qr_code_angular_size * parameters::qr_code_inverse_proportion;
+
   std::cout << "QR Code distance: " << parameters::qr_code_distance << " in." << std::endl;
+  std::cout << "Webcam FOV: " << qr_code_angular_size << " degrees" << std::endl; 
   std::cout << "Lenticule density: " << lenticule_density << " LPI" << std::endl;
 
   // Switch back to the main calibration stack

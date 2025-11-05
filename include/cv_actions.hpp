@@ -6,6 +6,7 @@ CV Actions. Captures from webcam and processes them.
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/objdetect.hpp>
 #include <cmath>
 
 
@@ -21,5 +22,11 @@ namespace cv_actions {
         cv::Mat& out_frame,
         cv::Point& left_eye_position,
         cv::Point& right_eye_position
+    );
+
+    bool detect_qr(
+        cv::VideoCapture& cap,
+        cv::Mat& out_frame,
+        float& qr_code_inverse_proportion
     );
 }

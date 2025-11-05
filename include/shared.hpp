@@ -26,10 +26,14 @@ namespace shared {
     extern GtkEditable* green_red_line_distance_editable;
     extern GtkEditable* horizontal_displacement_editable;
     extern GtkEditable* vertical_displacement_editable;
+
+    extern bool is_current_cv_action_face;
 }
 
 namespace parameters {
     extern float qr_code_distance;
+    extern float qr_code_inverse_proportion;
+    extern float webcam_fov_deg;
     extern float lenticule_density;
     extern float green_to_red_line_distance;
     extern float horizontal_displacement;
