@@ -27,3 +27,11 @@ namespace shared {
     extern GtkEditable* horizontal_displacement_editable;
     extern GtkEditable* vertical_displacement_editable;
 }
+
+namespace parameters {
+    extern float qr_code_distance;
+    extern float lenticule_density;
+    extern float green_to_red_line_distance;
+    extern float horizontal_displacement;
+    extern float vertical_displacement;
+}

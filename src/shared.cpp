@@ -20,3 +20,11 @@ namespace shared {
     GtkEditable* horizontal_displacement_editable = nullptr;
     GtkEditable* vertical_displacement_editable = nullptr;
 }
+
+namespace parameters {
+    float qr_code_distance = 0;
+    float lenticule_density = 0;
+    float green_to_red_line_distance = 0;
+    float horizontal_displacement = 0;
+    float vertical_displacement = 0;
+}

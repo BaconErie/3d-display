@@ -15,11 +15,10 @@ void event_handlers::on_measurements_continue_clicked(GtkWidget *widget, gpointe
 {
 
   std::string qr_code_distance_input(gtk_editable_get_chars(shared::qr_code_distance_editable, 0, -1));
-  float qr_code_distance = 0.0; 
   bool was_parse_successful = false;
 
   try {
-    qr_code_distance = std::stof(qr_code_distance_input);
+    parameters::qr_code_distance = std::stof(qr_code_distance_input);
     was_parse_successful = true;
   } catch (const std::invalid_argument& e) {
     std::cerr << "Invalid input for QR code distance: " << e.what() << std::endl;
@@ -42,7 +41,7 @@ void event_handlers::on_measurements_continue_clicked(GtkWidget *widget, gpointe
 
   if (!was_parse_successful) return;
 
-  std::cout << "QR Code distance: " << qr_code_distance << " in." << std::endl;
+  std::cout << "QR Code distance: " << parameters::qr_code_distance << " in." << std::endl;
   std::cout << "Lenticule density: " << lenticule_density << " LPI" << std::endl;
 
   // Switch back to the main calibration stack
@@ -53,11 +52,10 @@ void event_handlers::on_display_density_continue_clicked(GtkWidget *widget, gpoi
 {
 
   std::string green_to_red_line_distance_input(gtk_editable_get_chars(shared::green_red_line_distance_editable, 0, -1));
-  float green_to_red_line_distance = 0.0; 
   bool was_parse_successful = false;
 
   try {
-    green_to_red_line_distance = std::stof(green_to_red_line_distance_input);
+    parameters::green_to_red_line_distance = std::stof(green_to_red_line_distance_input);
     was_parse_successful = true;
   } catch (const std::invalid_argument& e) {
     std::cerr << "Invalid input for green to red line distance: " << e.what() << std::endl;
@@ -65,7 +63,7 @@ void event_handlers::on_display_density_continue_clicked(GtkWidget *widget, gpoi
 
   if (!was_parse_successful) return;
 
-  std::cout << "Distance from green to the red line: " << green_to_red_line_distance << " in." << std::endl;
+  std::cout << "Distance from green to the red line: " << parameters::green_to_red_line_distance << " in." << std::endl;
 
   // Switch to the horizontal displacement calibration stack
   gtk_stack_set_visible_child_name(shared::stack_widget, "horizontal_displacement_calibration_box");
@@ -74,11 +72,10 @@ void event_handlers::on_display_density_continue_clicked(GtkWidget *widget, gpoi
 void event_handlers::on_horizontal_displacement_continue_clicked(GtkWidget *widget, gpointer _)
 {
   std::string horizontal_displacement_input(gtk_editable_get_chars(shared::horizontal_displacement_editable, 0, -1));
-  float horizontal_displacement = 0.0; 
   bool was_parse_successful = false;
 
   try {
-    horizontal_displacement = std::stof(horizontal_displacement_input);
+    parameters::horizontal_displacement = std::stof(horizontal_displacement_input);
     was_parse_successful = true;
   } catch (const std::invalid_argument& e) {
     std::cerr << "Invalid input for horizontal displacement: " << e.what() << std::endl;
@@ -86,7 +83,7 @@ void event_handlers::on_horizontal_displacement_continue_clicked(GtkWidget *widg
 
   if (!was_parse_successful) return;
 
-  std::cout << "Horizontal displacement: " << horizontal_displacement << " in." << std::endl;
+  std::cout << "Horizontal displacement: " << parameters::horizontal_displacement << " in." << std::endl;
 
   // Switch to the vertical displacement calibration stack
   gtk_stack_set_visible_child_name(shared::stack_widget, "vertical_displacement_calibration_box");
@@ -95,11 +92,10 @@ void event_handlers::on_horizontal_displacement_continue_clicked(GtkWidget *widg
 void event_handlers::on_vertical_displacement_continue_clicked(GtkWidget *widget, gpointer _)
 {
   std::string vertical_displacement_input(gtk_editable_get_chars(shared::vertical_displacement_editable, 0, -1));
-  float vertical_displacement = 0.0; 
   bool was_parse_successful = false;
 
   try {
-    vertical_displacement = std::stof(vertical_displacement_input);
+    parameters::vertical_displacement = std::stof(vertical_displacement_input);
     was_parse_successful = true;
   } catch (const std::invalid_argument& e) {
     std::cerr << "Invalid input for vertical displacement: " << e.what() << std::endl;
@@ -107,7 +103,7 @@ void event_handlers::on_vertical_displacement_continue_clicked(GtkWidget *widget
 
   if (!was_parse_successful) return;
 
-  std::cout << "Vertical displacement: " << vertical_displacement << " in." << std::endl;
+  std::cout << "Vertical displacement: " << parameters::vertical_displacement << " in." << std::endl;
 
   // Switch to the measurements calibration stack
   gtk_stack_set_visible_child_name(shared::stack_widget, "main_box");
