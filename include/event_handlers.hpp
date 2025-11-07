@@ -1,10 +1,12 @@
 #pragma once
 
 #include <gtk/gtk.h>
-#include "gtk_signal_data.hpp"
 #include <iostream>
-#include "shared.hpp"
 #include <cmath>
+
+#include "gtk_signal_data.hpp"
+#include "shared.hpp"
+#include "interlacer.hpp"
 
 const float QR_CODE_WIDTH = 6;
 
@@ -15,4 +17,5 @@ namespace event_handlers {
     void on_horizontal_displacement_continue_clicked(GtkWidget *widget, gpointer data);
     void on_vertical_displacement_continue_clicked(GtkWidget *widget, gpointer data);
     void on_measurements_continue_clicked(GtkWidget *widget, gpointer data);
+    void on_start_display_clicked(GtkWidget *widget, gpointer data);
 }

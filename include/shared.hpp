@@ -7,7 +7,9 @@
 #include <opencv2/objdetect/face.hpp>
 #include <opencv2/core/types.hpp>
 
-namespace shared {
+#include <boost/asio.hpp>
+
+namespace shared_vars {
     extern GdkPaintable* webcam_paintable;
 
     extern std::mutex webcam_paintable_mutex;
@@ -28,6 +30,11 @@ namespace shared {
     extern GtkEditable* vertical_displacement_editable;
 
     extern bool is_current_cv_action_face;
+
+    extern boost::asio::io_context io_context;
+    extern boost::asio::ip::tcp::socket socket;
+    extern boost::asio::ip::tcp::endpoint endpoint;
+    extern boost::asio::ip::tcp::acceptor acceptor;
 }
 
 namespace parameters {

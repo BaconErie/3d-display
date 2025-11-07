@@ -1,6 +1,6 @@
 #include "shared.hpp"
 
-namespace shared {
+namespace shared_vars {
     GdkPaintable* webcam_paintable = nullptr;
 
     std::mutex webcam_paintable_mutex;
@@ -21,6 +21,11 @@ namespace shared {
     GtkEditable* vertical_displacement_editable = nullptr;
 
     bool is_current_cv_action_face = true;
+
+    boost::asio::io_context io_context;
+    boost::asio::ip::tcp::socket socket(io_context);
+    boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address(boost::asio::ip::address_v4(2130706433)), 42842);    
+    boost::asio::ip::tcp::acceptor acceptor(io_context);
 }
 
 namespace parameters {

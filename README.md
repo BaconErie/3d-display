@@ -171,3 +171,31 @@ https://github.com/opencv/opencv_zoo/tree/7e062e54cf5410c09b795ff71b4a255e58498c
 # Future Improvements
 
 - Use a newer version of OpenCV
+
+# Interlacing process
+
+For a set of parameters, the exit angle of each pixel is going to be constant.
+We can calculate this once and then we never need to recalculate again.
+
+What we do need to recalculate every frame is the angle of each eye, and then
+which eye the pixel should be directed towards.
+
+The message to the Godot program will be a series of 32 bit numbers. Each number
+indicates how many pixels are part of a left-eye/right-eye block.
+
+Left eye is negative, and right eye is positive.
+
+For example, the godot program may receive:
+
+-23 40 -25 40 -23
+
+Meaning: 23 pixels in a row that show left eye, 40 pixels in a row that show
+right eye, 25 pixels that show left eye, etc.
+
+Pixel blocks start on the left hand side.
+
+# Communication with the Rendering program
+
+1. Main program starts a TCP/IP socket server at port 78657
+2. Main program starts the Godot program
+3. Godot program connects

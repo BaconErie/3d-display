@@ -3,20 +3,19 @@
 void event_handlers::on_calibrate_button_clicked (GtkWidget *widget, gpointer _)
 {
   // Switch to the calibration stack first
-  shared::is_current_cv_action_face = false;
-  gtk_stack_set_visible_child_name(shared::stack_widget, "fov_calibration_box");
+  shared_vars::is_current_cv_action_face = false;
+  gtk_stack_set_visible_child_name(shared_vars::stack_widget, "fov_calibration_box");
 }
 
 void event_handlers::on_fov_calibration_capture_clicked(GtkWidget *widget, gpointer _)
 {
-  gtk_stack_set_visible_child_name(shared::stack_widget, "measurements_calibration_box");
-  shared::is_current_cv_action_face = true;
+  gtk_stack_set_visible_child_name(shared_vars::stack_widget, "measurements_calibration_box");
+  shared_vars::is_current_cv_action_face = true;
 }
 
 void event_handlers::on_measurements_continue_clicked(GtkWidget *widget, gpointer _)
 {
-
-  std::string qr_code_distance_input(gtk_editable_get_chars(shared::qr_code_distance_editable, 0, -1));
+  std::string qr_code_distance_input(gtk_editable_get_chars(shared_vars::qr_code_distance_editable, 0, -1));
   bool was_parse_successful = false;
 
   try {
@@ -30,7 +29,7 @@ void event_handlers::on_measurements_continue_clicked(GtkWidget *widget, gpointe
 
   // Get the lenticule density
 
-  std::string lenticule_density_input(gtk_editable_get_chars(shared::lenticule_density_editable, 0, -1));
+  std::string lenticule_density_input(gtk_editable_get_chars(shared_vars::lenticule_density_editable, 0, -1));
   float lenticule_density = 0.0; 
   was_parse_successful = false;
 
@@ -51,13 +50,13 @@ void event_handlers::on_measurements_continue_clicked(GtkWidget *widget, gpointe
   std::cout << "Lenticule density: " << lenticule_density << " LPI" << std::endl;
 
   // Switch back to the main calibration stack
-  gtk_stack_set_visible_child_name(shared::stack_widget, "display_density_calibration_box");
+  gtk_stack_set_visible_child_name(shared_vars::stack_widget, "display_density_calibration_box");
 }
 
 void event_handlers::on_display_density_continue_clicked(GtkWidget *widget, gpointer _)
 {
 
-  std::string green_to_red_line_distance_input(gtk_editable_get_chars(shared::green_red_line_distance_editable, 0, -1));
+  std::string green_to_red_line_distance_input(gtk_editable_get_chars(shared_vars::green_red_line_distance_editable, 0, -1));
   bool was_parse_successful = false;
 
   try {
@@ -72,12 +71,12 @@ void event_handlers::on_display_density_continue_clicked(GtkWidget *widget, gpoi
   std::cout << "Distance from green to the red line: " << parameters::green_to_red_line_distance << " in." << std::endl;
 
   // Switch to the horizontal displacement calibration stack
-  gtk_stack_set_visible_child_name(shared::stack_widget, "horizontal_displacement_calibration_box");
+  gtk_stack_set_visible_child_name(shared_vars::stack_widget, "horizontal_displacement_calibration_box");
 }
 
 void event_handlers::on_horizontal_displacement_continue_clicked(GtkWidget *widget, gpointer _)
 {
-  std::string horizontal_displacement_input(gtk_editable_get_chars(shared::horizontal_displacement_editable, 0, -1));
+  std::string horizontal_displacement_input(gtk_editable_get_chars(shared_vars::horizontal_displacement_editable, 0, -1));
   bool was_parse_successful = false;
 
   try {
@@ -92,12 +91,12 @@ void event_handlers::on_horizontal_displacement_continue_clicked(GtkWidget *widg
   std::cout << "Horizontal displacement: " << parameters::horizontal_displacement << " in." << std::endl;
 
   // Switch to the vertical displacement calibration stack
-  gtk_stack_set_visible_child_name(shared::stack_widget, "vertical_displacement_calibration_box");
+  gtk_stack_set_visible_child_name(shared_vars::stack_widget, "vertical_displacement_calibration_box");
 }
 
 void event_handlers::on_vertical_displacement_continue_clicked(GtkWidget *widget, gpointer _)
 {
-  std::string vertical_displacement_input(gtk_editable_get_chars(shared::vertical_displacement_editable, 0, -1));
+  std::string vertical_displacement_input(gtk_editable_get_chars(shared_vars::vertical_displacement_editable, 0, -1));
   bool was_parse_successful = false;
 
   try {
@@ -112,5 +111,17 @@ void event_handlers::on_vertical_displacement_continue_clicked(GtkWidget *widget
   std::cout << "Vertical displacement: " << parameters::vertical_displacement << " in." << std::endl;
 
   // Switch to the measurements calibration stack
-  gtk_stack_set_visible_child_name(shared::stack_widget, "main_box");
+  gtk_stack_set_visible_child_name(shared_vars::stack_widget, "main_box");
+}
+
+void event_handlers::on_start_display_clicked(GtkWidget *widget, gpointer _) {
+  std::cout << "Loading 3d display" << std::endl;
+  shared_vars::acceptor.open(shared_vars::endpoint.protocol());
+  shared_vars::acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
+  shared_vars::acceptor.bind(shared_vars::endpoint);
+  shared_vars::acceptor.listen(1);
+
+  std::cout << "Beginning listening for connections on port 42842" << std::endl;
+  std::thread t(interlacer::listen_for_renderer_socket_and_call_dispatcher);
+  t.detach();
 }

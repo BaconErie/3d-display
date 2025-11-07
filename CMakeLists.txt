@@ -35,6 +35,7 @@ add_executable(3d_display_program
     src/event_handlers.cpp
     src/cv_actions.cpp
     src/shared.cpp
+    src/interlacer.cpp
 )
 
 # Check if Blueprint compiler is installed.

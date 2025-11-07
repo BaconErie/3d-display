@@ -3,6 +3,8 @@
 #include <chrono>
 #include <mutex>
 
+#include <boost/asio.hpp>
+
 #include <gtk/gtk.h>
 #include <glibmm.h>
 
@@ -41,44 +43,44 @@ void request_cv_process_update() {
 
         cv::Mat output;
 
-        if (!shared::is_current_cv_action_face) { 
+        if (!shared_vars::is_current_cv_action_face) { 
             // Do QR Code
-            cv_actions::detect_qr(shared::webcam_capture, output, parameters::qr_code_inverse_proportion);
+            cv_actions::detect_qr(shared_vars::webcam_capture, output, parameters::qr_code_inverse_proportion);
         } else {
             // Run action
             cv::Point left_eye, right_eye;
-            cv_actions::detect_face(shared::face_detector_pointer, shared::bounding_box, shared::webcam_capture, output, left_eye, right_eye);
+            cv_actions::detect_face(shared_vars::face_detector_pointer, shared_vars::bounding_box, shared_vars::webcam_capture, output, left_eye, right_eye);
         }
 
         // Convert to GdkPaintable
         GdkPaintable* new_paintable = cv_mat_to_paintable(output);
 
         // Lock the mutex
-        shared::webcam_paintable_mutex.lock();
-        if (shared::webcam_paintable) {
-        g_object_unref(shared::webcam_paintable);
+        shared_vars::webcam_paintable_mutex.lock();
+        if (shared_vars::webcam_paintable) {
+        g_object_unref(shared_vars::webcam_paintable);
         }
 
         // Update the shared paintable
-        shared::webcam_paintable = new_paintable;
+        shared_vars::webcam_paintable = new_paintable;
 
         // Unlock mutex
-        shared::webcam_paintable_mutex.unlock();
+        shared_vars::webcam_paintable_mutex.unlock();
 
         // Notify the main thread to update the UI
-        shared::webcam_dispatcher.emit();
+        shared_vars::webcam_dispatcher.emit();
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1000/60));
     }
 }
 
 void handle_webcam_dispatch() {  
-    shared::webcam_paintable_mutex.lock();
+    shared_vars::webcam_paintable_mutex.lock();
 
-    gtk_picture_set_paintable(shared::main_webcam_image, shared::webcam_paintable);
-    gtk_picture_set_paintable(shared::fov_webcam_image, shared::webcam_paintable);
+    gtk_picture_set_paintable(shared_vars::main_webcam_image, shared_vars::webcam_paintable);
+    gtk_picture_set_paintable(shared_vars::fov_webcam_image, shared_vars::webcam_paintable);
 
-    shared::webcam_paintable_mutex.unlock();
+    shared_vars::webcam_paintable_mutex.unlock();
 }
 
 // Signal handler for the button click
@@ -133,29 +135,29 @@ activate (GtkApplication *app,
     }
 
     // Set up webcam image variables
-    shared::main_webcam_image = GTK_PICTURE(gtk_builder_get_object (builder, "main_webcam_image"));
-    shared::fov_webcam_image = GTK_PICTURE(gtk_builder_get_object (builder, "fov_webcam_image"));
+    shared_vars::main_webcam_image = GTK_PICTURE(gtk_builder_get_object (builder, "main_webcam_image"));
+    shared_vars::fov_webcam_image = GTK_PICTURE(gtk_builder_get_object (builder, "fov_webcam_image"));
 
     // Set up video capture
-    shared::webcam_capture.open(0);
-    if (!shared::webcam_capture.isOpened()) {
+    shared_vars::webcam_capture.open(0);
+    if (!shared_vars::webcam_capture.isOpened()) {
         std::cerr << "Error: Could not open webcam." << std::endl;
     }
 
     // Get a frame and set up bounding box
     cv::Mat first_frame;
-    shared::webcam_capture >> first_frame;
+    shared_vars::webcam_capture >> first_frame;
     if (first_frame.empty()) {
         std::cerr << "Error: Could not capture initial frame from webcam." << std::endl;
     } else {
-        shared::bounding_box = cv::Rect(0, 0, first_frame.cols, first_frame.rows);
+        shared_vars::bounding_box = cv::Rect(0, 0, first_frame.cols, first_frame.rows);
     }
 
     // Set up face detector
-    shared::face_detector_pointer = cv::FaceDetectorYN::create("models/face_detector_model.onnx", "", cv::Size(1, 1), 0.9, 0.3, 1);
+    shared_vars::face_detector_pointer = cv::FaceDetectorYN::create("models/face_detector_model.onnx", "", cv::Size(1, 1), 0.9, 0.3, 1);
 
     // Connect the dispatcher signal to the handler
-    shared::webcam_dispatcher.connect([]() {
+    shared_vars::webcam_dispatcher.connect([]() {
         handle_webcam_dispatch();
     });
 
@@ -172,7 +174,7 @@ activate (GtkApplication *app,
                                               GTK_STYLE_PROVIDER_PRIORITY_USER);
 
     // Set the stack pointer
-    shared::stack_widget = GTK_STACK(gtk_builder_get_object(builder, "main_stack"));
+    shared_vars::stack_widget = GTK_STACK(gtk_builder_get_object(builder, "main_stack"));
 
     // Connect signal for buttons
     GtkWidget *calibrate_button = GTK_WIDGET(gtk_builder_get_object(builder, "calibrate_button"));
@@ -181,6 +183,7 @@ activate (GtkApplication *app,
     GtkWidget *horizontal_displacement_continue_button = GTK_WIDGET(gtk_builder_get_object(builder, "horizontal_displacement_continue_button"));
     GtkWidget *vertical_displacement_continue_button = GTK_WIDGET(gtk_builder_get_object(builder, "vertical_displacement_continue_button"));
     GtkWidget *measurements_continue_button = GTK_WIDGET(gtk_builder_get_object(builder, "measurements_continue_button"));
+    GtkWidget *start_display_button = GTK_WIDGET(gtk_builder_get_object(builder, "start_display_button"));
 
     g_signal_connect(calibrate_button, "clicked", G_CALLBACK(event_handlers::on_calibrate_button_clicked), NULL);
     g_signal_connect(fov_calibration_capture_button, "clicked", G_CALLBACK(event_handlers::on_fov_calibration_capture_clicked), NULL);
@@ -188,13 +191,14 @@ activate (GtkApplication *app,
     g_signal_connect(horizontal_displacement_continue_button, "clicked", G_CALLBACK(event_handlers::on_horizontal_displacement_continue_clicked), NULL);
     g_signal_connect(vertical_displacement_continue_button, "clicked", G_CALLBACK(event_handlers::on_vertical_displacement_continue_clicked), NULL);
     g_signal_connect(measurements_continue_button, "clicked", G_CALLBACK(event_handlers::on_measurements_continue_clicked), NULL);
+    g_signal_connect(start_display_button, "clicked", G_CALLBACK(event_handlers::on_start_display_clicked), NULL);
 
     // Set up the entry pointers
-    shared::qr_code_distance_editable = GTK_EDITABLE(gtk_builder_get_object(builder, "qr_code_distance_entry"));
-    shared::lenticule_density_editable = GTK_EDITABLE(gtk_builder_get_object(builder, "lenticule_density_entry"));
-    shared::green_red_line_distance_editable = GTK_EDITABLE(gtk_builder_get_object(builder, "green_red_line_distance_entry"));
-    shared::horizontal_displacement_editable = GTK_EDITABLE(gtk_builder_get_object(builder, "horizontal_displacement_entry"));
-    shared::vertical_displacement_editable = GTK_EDITABLE(gtk_builder_get_object(builder, "vertical_displacement_entry"));
+    shared_vars::qr_code_distance_editable = GTK_EDITABLE(gtk_builder_get_object(builder, "qr_code_distance_entry"));
+    shared_vars::lenticule_density_editable = GTK_EDITABLE(gtk_builder_get_object(builder, "lenticule_density_entry"));
+    shared_vars::green_red_line_distance_editable = GTK_EDITABLE(gtk_builder_get_object(builder, "green_red_line_distance_entry"));
+    shared_vars::horizontal_displacement_editable = GTK_EDITABLE(gtk_builder_get_object(builder, "horizontal_displacement_entry"));
+    shared_vars::vertical_displacement_editable = GTK_EDITABLE(gtk_builder_get_object(builder, "vertical_displacement_entry"));
 
 
     // Show the window
