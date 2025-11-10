@@ -26,6 +26,10 @@ namespace shared_vars {
     boost::asio::ip::tcp::socket socket(io_context);
     boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address(boost::asio::ip::address_v4(2130706433)), 42842);    
     boost::asio::ip::tcp::acceptor acceptor(io_context);
+
+    Glib::Dispatcher renderer_ready_dispatcher; 
+
+    GtkBuilder *builder = nullptr;
 }
 
 namespace parameters {

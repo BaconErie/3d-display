@@ -95,14 +95,13 @@ static void
 activate (GtkApplication *app,
           void        *_)
 {
-    GtkBuilder *builder;
     GtkWidget *window;
     GtkCssProvider *css_provider;
     GError *error = NULL;
 
     // Create a builder and load the UI file
-    builder = gtk_builder_new ();
-    if (!gtk_builder_add_from_file (builder, "ui/main.ui", &error)) {
+    shared_vars::builder = gtk_builder_new ();
+    if (!gtk_builder_add_from_file (shared_vars::builder, "ui/main.ui", &error)) {
       g_critical ("Error loading UI file: %s", error->message);
       g_error_free (error);
       return;
@@ -110,12 +109,12 @@ activate (GtkApplication *app,
 
 
     // Get the main window from the builder
-    window = GTK_WIDGET (gtk_builder_get_object (builder, "main_window"));
+    window = GTK_WIDGET (gtk_builder_get_object (shared_vars::builder, "main_window"));
     gtk_window_set_application (GTK_WINDOW (window), app);
 
     
     // Get the horizontal_displacement_diagram picture widget and set its file
-    GtkWidget *horizontal_displacement_diagram = GTK_WIDGET (gtk_builder_get_object (builder, "horizontal_displacement_diagram"));
+    GtkWidget *horizontal_displacement_diagram = GTK_WIDGET (gtk_builder_get_object (shared_vars::builder, "horizontal_displacement_diagram"));
     if (horizontal_displacement_diagram) {
       GFile *image_file = g_file_new_for_path("/home/eric/3d-display/programs/program/horizontal-displacement-diagram.png");
       gtk_picture_set_file(GTK_PICTURE(horizontal_displacement_diagram), image_file);
@@ -125,7 +124,7 @@ activate (GtkApplication *app,
     }
 
     // Get the vertical_displacement_diagram picture widget and set its file
-    GtkWidget *vertical_displacement_diagram = GTK_WIDGET (gtk_builder_get_object (builder, "vertical_displacement_diagram"));
+    GtkWidget *vertical_displacement_diagram = GTK_WIDGET (gtk_builder_get_object (shared_vars::builder, "vertical_displacement_diagram"));
     if (vertical_displacement_diagram) {
       GFile *image_file = g_file_new_for_path("/home/eric/3d-display/programs/program/vertical-displacement-diagram.png");
       gtk_picture_set_file(GTK_PICTURE(vertical_displacement_diagram), image_file);
@@ -135,8 +134,8 @@ activate (GtkApplication *app,
     }
 
     // Set up webcam image variables
-    shared_vars::main_webcam_image = GTK_PICTURE(gtk_builder_get_object (builder, "main_webcam_image"));
-    shared_vars::fov_webcam_image = GTK_PICTURE(gtk_builder_get_object (builder, "fov_webcam_image"));
+    shared_vars::main_webcam_image = GTK_PICTURE(gtk_builder_get_object (shared_vars::builder, "main_webcam_image"));
+    shared_vars::fov_webcam_image = GTK_PICTURE(gtk_builder_get_object (shared_vars::builder, "fov_webcam_image"));
 
     // Set up video capture
     shared_vars::webcam_capture.open(0);
@@ -174,16 +173,16 @@ activate (GtkApplication *app,
                                               GTK_STYLE_PROVIDER_PRIORITY_USER);
 
     // Set the stack pointer
-    shared_vars::stack_widget = GTK_STACK(gtk_builder_get_object(builder, "main_stack"));
+    shared_vars::stack_widget = GTK_STACK(gtk_builder_get_object(shared_vars::builder, "main_stack"));
 
     // Connect signal for buttons
-    GtkWidget *calibrate_button = GTK_WIDGET(gtk_builder_get_object(builder, "calibrate_button"));
-    GtkWidget *fov_calibration_capture_button = GTK_WIDGET(gtk_builder_get_object(builder, "fov_calibration_capture_button"));
-    GtkWidget *display_density_continue_button = GTK_WIDGET(gtk_builder_get_object(builder, "display_density_continue_button"));
-    GtkWidget *horizontal_displacement_continue_button = GTK_WIDGET(gtk_builder_get_object(builder, "horizontal_displacement_continue_button"));
-    GtkWidget *vertical_displacement_continue_button = GTK_WIDGET(gtk_builder_get_object(builder, "vertical_displacement_continue_button"));
-    GtkWidget *measurements_continue_button = GTK_WIDGET(gtk_builder_get_object(builder, "measurements_continue_button"));
-    GtkWidget *start_display_button = GTK_WIDGET(gtk_builder_get_object(builder, "start_display_button"));
+    GtkWidget *calibrate_button = GTK_WIDGET(gtk_builder_get_object(shared_vars::builder, "calibrate_button"));
+    GtkWidget *fov_calibration_capture_button = GTK_WIDGET(gtk_builder_get_object(shared_vars::builder, "fov_calibration_capture_button"));
+    GtkWidget *display_density_continue_button = GTK_WIDGET(gtk_builder_get_object(shared_vars::builder, "display_density_continue_button"));
+    GtkWidget *horizontal_displacement_continue_button = GTK_WIDGET(gtk_builder_get_object(shared_vars::builder, "horizontal_displacement_continue_button"));
+    GtkWidget *vertical_displacement_continue_button = GTK_WIDGET(gtk_builder_get_object(shared_vars::builder, "vertical_displacement_continue_button"));
+    GtkWidget *measurements_continue_button = GTK_WIDGET(gtk_builder_get_object(shared_vars::builder, "measurements_continue_button"));
+    GtkWidget *start_display_button = GTK_WIDGET(gtk_builder_get_object(shared_vars::builder, "start_display_button"));
 
     g_signal_connect(calibrate_button, "clicked", G_CALLBACK(event_handlers::on_calibrate_button_clicked), NULL);
     g_signal_connect(fov_calibration_capture_button, "clicked", G_CALLBACK(event_handlers::on_fov_calibration_capture_clicked), NULL);
@@ -193,12 +192,17 @@ activate (GtkApplication *app,
     g_signal_connect(measurements_continue_button, "clicked", G_CALLBACK(event_handlers::on_measurements_continue_clicked), NULL);
     g_signal_connect(start_display_button, "clicked", G_CALLBACK(event_handlers::on_start_display_clicked), NULL);
 
+    // Set up renderer ready dispatcher
+    shared_vars::renderer_ready_dispatcher.connect([]() {
+        event_handlers::on_renderer_success();
+    });
+
     // Set up the entry pointers
-    shared_vars::qr_code_distance_editable = GTK_EDITABLE(gtk_builder_get_object(builder, "qr_code_distance_entry"));
-    shared_vars::lenticule_density_editable = GTK_EDITABLE(gtk_builder_get_object(builder, "lenticule_density_entry"));
-    shared_vars::green_red_line_distance_editable = GTK_EDITABLE(gtk_builder_get_object(builder, "green_red_line_distance_entry"));
-    shared_vars::horizontal_displacement_editable = GTK_EDITABLE(gtk_builder_get_object(builder, "horizontal_displacement_entry"));
-    shared_vars::vertical_displacement_editable = GTK_EDITABLE(gtk_builder_get_object(builder, "vertical_displacement_entry"));
+    shared_vars::qr_code_distance_editable = GTK_EDITABLE(gtk_builder_get_object(shared_vars::builder, "qr_code_distance_entry"));
+    shared_vars::lenticule_density_editable = GTK_EDITABLE(gtk_builder_get_object(shared_vars::builder, "lenticule_density_entry"));
+    shared_vars::green_red_line_distance_editable = GTK_EDITABLE(gtk_builder_get_object(shared_vars::builder, "green_red_line_distance_entry"));
+    shared_vars::horizontal_displacement_editable = GTK_EDITABLE(gtk_builder_get_object(shared_vars::builder, "horizontal_displacement_entry"));
+    shared_vars::vertical_displacement_editable = GTK_EDITABLE(gtk_builder_get_object(shared_vars::builder, "vertical_displacement_entry"));
 
 
     // Show the window

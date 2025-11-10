@@ -10,4 +10,5 @@ void interlacer::listen_for_renderer_socket_and_call_dispatcher() {
     std::cout << "We accepted something!!!!." << std::endl;
     boost::asio::write(shared_vars::socket, boost::asio::buffer("Hello!"));
     std::cout << "Done writing." << std::endl;
+    shared_vars::renderer_ready_dispatcher.emit();
 }

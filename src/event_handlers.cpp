@@ -115,13 +115,20 @@ void event_handlers::on_vertical_displacement_continue_clicked(GtkWidget *widget
 }
 
 void event_handlers::on_start_display_clicked(GtkWidget *widget, gpointer _) {
-  std::cout << "Loading 3d display" << std::endl;
+  GtkButton *button = GTK_BUTTON(widget);
+
+  gtk_button_set_label(button, "Loading 3D renderer...");
+  gtk_widget_set_sensitive(widget, false);
+
   shared_vars::acceptor.open(shared_vars::endpoint.protocol());
   shared_vars::acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
   shared_vars::acceptor.bind(shared_vars::endpoint);
   shared_vars::acceptor.listen(1);
 
-  std::cout << "Beginning listening for connections on port 42842" << std::endl;
   std::thread t(interlacer::listen_for_renderer_socket_and_call_dispatcher);
   t.detach();
+}
+
+void event_handlers::on_renderer_success() {
+    gtk_button_set_label(GTK_BUTTON(gtk_builder_get_object(shared_vars::builder, "start_display_button")), "Display active");
 }

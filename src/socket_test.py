@@ -13,6 +13,7 @@ try:
     print("Server says:", stuff.decode())
 
     print("Closing socket")
+    s.close()
     
 except ConnectionRefusedError:
     print("Connection refused - server not running")

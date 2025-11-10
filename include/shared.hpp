@@ -12,6 +12,8 @@
 namespace shared_vars {
     extern GdkPaintable* webcam_paintable;
 
+    extern GtkBuilder *builder;
+
     extern std::mutex webcam_paintable_mutex;
     extern cv::VideoCapture webcam_capture;
     extern Glib::Dispatcher webcam_dispatcher;
@@ -35,6 +37,8 @@ namespace shared_vars {
     extern boost::asio::ip::tcp::socket socket;
     extern boost::asio::ip::tcp::endpoint endpoint;
     extern boost::asio::ip::tcp::acceptor acceptor;
+
+    extern Glib::Dispatcher renderer_ready_dispatcher; 
 }
 
 namespace parameters {
