@@ -30,11 +30,10 @@ void event_handlers::on_measurements_continue_clicked(GtkWidget *widget, gpointe
   // Get the lenticule density
 
   std::string lenticule_density_input(gtk_editable_get_chars(shared_vars::lenticule_density_editable, 0, -1));
-  float lenticule_density = 0.0; 
   was_parse_successful = false;
 
   try {
-    lenticule_density = std::stof(lenticule_density_input);
+    parameters::lenticule_density = std::stof(lenticule_density_input);
     was_parse_successful = true;
   } catch (const std::invalid_argument& e) {
     std::cerr << "Invalid input for lenticule density: " << e.what() << std::endl;
@@ -47,9 +46,14 @@ void event_handlers::on_measurements_continue_clicked(GtkWidget *widget, gpointe
 
   std::cout << "QR Code distance: " << parameters::qr_code_distance << " in." << std::endl;
   std::cout << "Webcam FOV: " << qr_code_angular_size << " degrees" << std::endl; 
-  std::cout << "Lenticule density: " << lenticule_density << " LPI" << std::endl;
+  std::cout << "Lenticule density: " << parameters::lenticule_density << " LPI" << std::endl;
 
-  // Switch back to the main calibration stack
+  // Tell 3D renderer to display the measurement window
+  std::vector<int64_t> message;
+  message.push_back((int64_t)0);
+  boost::asio::write(shared_vars::socket, boost::asio::buffer(message));
+
+  // Switch to display density
   gtk_stack_set_visible_child_name(shared_vars::stack_widget, "display_density_calibration_box");
 }
 
@@ -69,6 +73,11 @@ void event_handlers::on_display_density_continue_clicked(GtkWidget *widget, gpoi
   if (!was_parse_successful) return;
 
   std::cout << "Distance from green to the red line: " << parameters::green_to_red_line_distance << " in." << std::endl;
+
+  // Tell 3D renderer to hide the measurement window
+  std::vector<int64_t> message;
+  message.push_back((int64_t)1);
+  boost::asio::write(shared_vars::socket, boost::asio::buffer(message));
 
   // Switch to the horizontal displacement calibration stack
   gtk_stack_set_visible_child_name(shared_vars::stack_widget, "horizontal_displacement_calibration_box");
@@ -109,6 +118,20 @@ void event_handlers::on_vertical_displacement_continue_clicked(GtkWidget *widget
   if (!was_parse_successful) return;
 
   std::cout << "Vertical displacement: " << parameters::vertical_displacement << " in." << std::endl;
+
+  // Ask for horizontal window size from 3D renderer
+  std::vector<int64_t> message;
+  message.push_back((int64_t)3);
+  boost::asio::write(shared_vars::socket, boost::asio::buffer(message));
+
+  std::uint64_t response[1];
+  boost::system::error_code error;
+  shared_vars::socket.read_some(boost::asio::buffer(response), error);
+
+  parameters::window_width = response[0];
+  
+  // Set up interlacer variables
+  interlacer::setup();
 
   // Switch to the measurements calibration stack
   gtk_stack_set_visible_child_name(shared_vars::stack_widget, "main_box");

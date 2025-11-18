@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 #include <gtk/gtk.h>
 #include <glibmm.h>
 
@@ -49,4 +51,5 @@ namespace parameters {
     extern float green_to_red_line_distance;
     extern float horizontal_displacement;
     extern float vertical_displacement;
+    extern float window_width;
 }

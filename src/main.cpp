@@ -116,7 +116,7 @@ activate (GtkApplication *app,
     // Get the horizontal_displacement_diagram picture widget and set its file
     GtkWidget *horizontal_displacement_diagram = GTK_WIDGET (gtk_builder_get_object (shared_vars::builder, "horizontal_displacement_diagram"));
     if (horizontal_displacement_diagram) {
-      GFile *image_file = g_file_new_for_path("/home/eric/3d-display/programs/program/horizontal-displacement-diagram.png");
+      GFile *image_file = g_file_new_for_path("horizontal-displacement-diagram.png");
       gtk_picture_set_file(GTK_PICTURE(horizontal_displacement_diagram), image_file);
       g_object_unref(image_file);
     } else {
@@ -126,7 +126,7 @@ activate (GtkApplication *app,
     // Get the vertical_displacement_diagram picture widget and set its file
     GtkWidget *vertical_displacement_diagram = GTK_WIDGET (gtk_builder_get_object (shared_vars::builder, "vertical_displacement_diagram"));
     if (vertical_displacement_diagram) {
-      GFile *image_file = g_file_new_for_path("/home/eric/3d-display/programs/program/vertical-displacement-diagram.png");
+      GFile *image_file = g_file_new_for_path("vertical-displacement-diagram.png");
       gtk_picture_set_file(GTK_PICTURE(vertical_displacement_diagram), image_file);
       g_object_unref(image_file);
     } else {

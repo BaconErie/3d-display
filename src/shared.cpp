@@ -40,4 +40,5 @@ namespace parameters {
     float green_to_red_line_distance = 0;
     float horizontal_displacement = 0;
     float vertical_displacement = 0;
+    float window_width = 0;
 }
