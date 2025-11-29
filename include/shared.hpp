@@ -41,6 +41,7 @@ namespace shared_vars {
     extern boost::asio::ip::tcp::acceptor acceptor;
 
     extern Glib::Dispatcher renderer_ready_dispatcher;
+    extern bool is_renderer_active;
 
     extern double left_eye_horizontal_angle;
     extern double right_eye_horizontal_angle;

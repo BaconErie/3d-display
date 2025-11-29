@@ -59,6 +59,19 @@ void request_cv_process_update() {
             shared_vars::left_eye_vertical_angle = std::get<1>(left_eye_position_proportion_from_center) * (parameters::webcam_fov_deg / 2.0f);
             shared_vars::right_eye_horizontal_angle = std::get<0>(right_eye_position_proportion_from_center) * (parameters::webcam_fov_deg / 2.0f);
             shared_vars::right_eye_vertical_angle = std::get<1>(right_eye_position_proportion_from_center) * (parameters::webcam_fov_deg / 2.0f);
+
+            if (shared_vars::is_renderer_active) {
+                std::vector<int64_t> request_code;
+                request_code.push_back((int64_t)4);
+                boost::asio::write(shared_vars::socket, boost::asio::buffer(request_code));
+
+                std::vector<double_t> message;
+                message.push_back((double_t)shared_vars::left_eye_horizontal_angle);
+                message.push_back((double_t)shared_vars::left_eye_vertical_angle);
+                message.push_back((double_t)shared_vars::right_eye_horizontal_angle);
+                message.push_back((double_t)shared_vars::right_eye_vertical_angle);
+                boost::asio::write(shared_vars::socket, boost::asio::buffer(message));
+            }
         }
 
         // Convert to GdkPaintable

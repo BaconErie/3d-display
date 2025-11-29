@@ -153,5 +153,6 @@ void event_handlers::on_start_display_clicked(GtkWidget *widget, gpointer _) {
 }
 
 void event_handlers::on_renderer_success() {
+    shared_vars::is_renderer_active = true;
     gtk_button_set_label(GTK_BUTTON(gtk_builder_get_object(shared_vars::builder, "start_display_button")), "Display active");
 }
