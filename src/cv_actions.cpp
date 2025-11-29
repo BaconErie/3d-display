@@ -5,8 +5,8 @@ bool cv_actions::detect_face(
     cv::Rect& search_bounds,
     cv::VideoCapture &cap,
     cv::Mat& out_frame, 
-    cv::Point& left_eye_position,
-    cv::Point& right_eye_position
+    std::tuple<double, double>& left_eye_position_proportion_from_center,
+    std::tuple<double, double>& right_eye_position_proportion_from_center
 ) {
     if (search_bounds.width < 63 || search_bounds.height < 63) {
         // Minimum size for the face detector is 63x63, otherwise it crashes(?)
@@ -44,6 +44,21 @@ bool cv_actions::detect_face(
     int face_height = (int)output_array.at<float>(0, 3);
     cv::Rect face_rect(face_x, face_y, face_width, face_height);
 
+
+    std::cout << "Left eye x position: " << (double)(output_array.at<float>(0, 6) + search_bounds.x - out_frame.cols/2) << std::endl;
+
+    left_eye_position_proportion_from_center = std::make_tuple(
+        (double)(output_array.at<float>(0, 6) + search_bounds.x - out_frame.cols/2) / out_frame.cols * 2,
+        (double)(output_array.at<float>(0, 7) + search_bounds.y - out_frame.rows/2) / out_frame.rows * 2
+    );
+
+    right_eye_position_proportion_from_center = std::make_tuple(
+        (double)(output_array.at<float>(0, 4) + search_bounds.x - out_frame.cols/2) / out_frame.cols * 2,
+        (double)(output_array.at<float>(0, 5) + search_bounds.y - out_frame.rows/2) / out_frame.rows * 2
+    );
+
+    cv::Point left_eye_position;
+    cv::Point right_eye_position;
 
     left_eye_position = cv::Point(
         (int)output_array.at<float>(0, 6) + search_bounds.x,

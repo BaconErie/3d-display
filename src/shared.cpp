@@ -30,6 +30,11 @@ namespace shared_vars {
     Glib::Dispatcher renderer_ready_dispatcher; 
 
     GtkBuilder *builder = nullptr;
+
+    double left_eye_horizontal_angle = 0;
+    double right_eye_horizontal_angle = 0;
+    double left_eye_vertical_angle = 0;
+    double right_eye_vertical_angle = 0;
 }
 
 namespace parameters {

@@ -8,6 +8,7 @@ CV Actions. Captures from webcam and processes them.
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/objdetect.hpp>
 #include <cmath>
+#include <tuple>
 
 
 const float SEARCH_AREA_SIZE = 1.5f;
@@ -20,8 +21,8 @@ namespace cv_actions {
         cv::Rect& bounding_box,
         cv::VideoCapture& cap,
         cv::Mat& out_frame,
-        cv::Point& left_eye_position,
-        cv::Point& right_eye_position
+        std::tuple<double, double>& left_eye_position_proportion_from_center,
+        std::tuple<double, double>& right_eye_position_proportion_from_center
     );
 
     bool detect_qr(

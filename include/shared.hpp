@@ -40,7 +40,12 @@ namespace shared_vars {
     extern boost::asio::ip::tcp::endpoint endpoint;
     extern boost::asio::ip::tcp::acceptor acceptor;
 
-    extern Glib::Dispatcher renderer_ready_dispatcher; 
+    extern Glib::Dispatcher renderer_ready_dispatcher;
+
+    extern double left_eye_horizontal_angle;
+    extern double right_eye_horizontal_angle;
+    extern double left_eye_vertical_angle;
+    extern double right_eye_vertical_angle;
 }
 
 namespace parameters {

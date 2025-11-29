@@ -41,6 +41,9 @@ GdkPaintable* cv_mat_to_paintable(const cv::Mat& mat) {
 void request_cv_process_update() {
     while (true) {
 
+        // Lock the mutex
+        shared_vars::webcam_paintable_mutex.lock();
+
         cv::Mat output;
 
         if (!shared_vars::is_current_cv_action_face) { 
@@ -48,15 +51,20 @@ void request_cv_process_update() {
             cv_actions::detect_qr(shared_vars::webcam_capture, output, parameters::qr_code_inverse_proportion);
         } else {
             // Run action
-            cv::Point left_eye, right_eye;
-            cv_actions::detect_face(shared_vars::face_detector_pointer, shared_vars::bounding_box, shared_vars::webcam_capture, output, left_eye, right_eye);
+            std::tuple<double, double> left_eye_position_proportion_from_center;
+            std::tuple<double, double> right_eye_position_proportion_from_center;
+            cv_actions::detect_face(shared_vars::face_detector_pointer, shared_vars::bounding_box, shared_vars::webcam_capture, output, left_eye_position_proportion_from_center, right_eye_position_proportion_from_center);
+        
+            shared_vars::left_eye_horizontal_angle = std::get<0>(left_eye_position_proportion_from_center) * (parameters::webcam_fov_deg / 2.0f);
+            shared_vars::left_eye_vertical_angle = std::get<1>(left_eye_position_proportion_from_center) * (parameters::webcam_fov_deg / 2.0f);
+            shared_vars::right_eye_horizontal_angle = std::get<0>(right_eye_position_proportion_from_center) * (parameters::webcam_fov_deg / 2.0f);
+            shared_vars::right_eye_vertical_angle = std::get<1>(right_eye_position_proportion_from_center) * (parameters::webcam_fov_deg / 2.0f);
         }
 
         // Convert to GdkPaintable
         GdkPaintable* new_paintable = cv_mat_to_paintable(output);
 
-        // Lock the mutex
-        shared_vars::webcam_paintable_mutex.lock();
+        
         if (shared_vars::webcam_paintable) {
         g_object_unref(shared_vars::webcam_paintable);
         }
