@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 #include <cmath>
+#include <mutex>
 
 // Handles interlacer and 3D renderer
 
@@ -15,6 +16,7 @@ namespace interlacer {
     extern int PIXELS_PER_INCH; // Number of pixels per inch on the display
     extern double LENS_PER_INCH; // Amount of lenses per inch on the display
     extern double DISPLAY_SIZE;
+    extern std::mutex pixel_exit_angles_mutex;
 
     void setup();
 
@@ -23,8 +25,13 @@ namespace interlacer {
     double t(double x); // Returns the exit angle of the pixel at x distance from the center of the lens
 
     void calculate_pixel_exit_angles();
-    void calculate_eye_angles(double& left_eye, double& right_eye);
-    void get_renderer_message_string();
+    void calculate_segments(
+        int renderer_width,
+        unsigned char& is_first_segment_left_eye,
+        std::vector<uint64_t>& segments_vector,
+        float left_eye_horizontal_angle,
+        float right_eye_horizontal_angle
+    );
 
     void listen_for_renderer_socket_and_call_dispatcher(); // Run this in a new thread, because socket accept blocks.
 }

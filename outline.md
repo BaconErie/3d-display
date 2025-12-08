@@ -152,3 +152,106 @@ interlacing algorithms, program
   hyperparameters, or train my own model. There is both face and eye datasets on
   Kaggle and other sites, and I can always augment these datasets by introducing
   noise, rotation, occlusions, and other transformations.
+
+# Renderer - Controller Communication
+
+Renderer needs to tell the controller:
+
+1. Eye angles
+2. Interlacing pattern.
+3. Getting window size
+4. Show or hide the display density test image.
+
+All values are little endian.
+
+Every message begins with a 64-bit signed integer that is the request code. This
+signals which action is required by the controller.
+
+## Eye angles
+
+The eye angles message is in total 40 bytes long, or 320 bits in total.
+
+Like all messages, the first byte is the request code. For eye angle messages,
+it is a request code of 4.
+
+Then follows 4 64-bit or 8 byte doubles. They are, in order:
+
+1. Left eye horizontal angle
+2. Left eye vertical angle
+3. Right eye horizontal angle
+4. Right eye vertical angle.
+
+## Interlacing pattern
+
+The length of the interlacing pattern may be indefinitely long. A stop marker is
+used to signal the stop of the message.
+
+The request code is 5.
+
+After the request code is a single unsigned byte. It will be 0 to show that the
+first interlacing segment is for the left eye, and any other value if the first
+interlacing segment is for the right eye.
+
+Every piece of data following is a 64-bit unsigned integer. This shows the
+length in pixels of the interlacing segment. Segments alternate between left and
+right.
+
+The message ends when the renderer receives the highest possible 64-bit unsigned
+integer, which is 18,446,744,073,709,551,615.
+
+# Calculating the Segments
+
+```cpp
+Every detect face action
+
+int renderer_width_pixels = get renderer width
+
+std::vector<uint64_t> segments_vector
+
+
+```
+
+# Rendering the segments
+
+We are given:
+
+1. Vertical FOV: 75 degrees, Y
+2. Vertical pixel size, y
+3. Horizontal pixel size, x
+
+We need to find the horizontal FOV, X of the camera that will fit this segment
+and still maintain the vertical FOV.
+
+From https://en.wikipedia.org/wiki/Field_of_view_in_video_games, the formula is
+
+$$
+X = 2\arctan\left(\tan\left(\frac{Y}{2}\right) \times \frac{x}{y} \right)
+$$
+
+The wiki article then cites
+
+https://learn.microsoft.com/en-us/windows/win32/direct3d9/projection-transform?redirectedfrom=MSDN
+
+but the formula is not directly there so might need to do some more digging
+
+## Pseudocode
+
+To render all these different segments, each segment is a viewport window and
+has a corresponding camera.
+
+This means we need to make a lot of cameras with the same position, but with
+different FOVs and with different rotations.
+
+Idea is that if you combine all the cameras for a particular eye and replaced
+them with a single camera with the entire field of view, that camera's center
+should be pointing at the origin.
+
+1. Calculate `combined_camera_horizontal_fov`. Use the formula from above but
+   use the horizontal pixel as the entire screen FOV
+2. Vertical FOV should always be 75
+3. Calculate `combined_camera_left_angle_limit` and
+   `combined_camera_right_angle_limit`.
+4. Starting with the first segment of that eye, calculate the horizontal FOV of
+   that segment, then position the camera so that its left limit is on the
+   combined left angle limit. Do something like half the camera horizontal FOV,
+   rotate it so that left limit + half or something

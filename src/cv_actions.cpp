@@ -8,10 +8,6 @@ bool cv_actions::detect_face(
     std::tuple<double, double>& left_eye_position_proportion_from_center,
     std::tuple<double, double>& right_eye_position_proportion_from_center
 ) {
-    if (search_bounds.width < 63 || search_bounds.height < 63) {
-        // Minimum size for the face detector is 63x63, otherwise it crashes(?)
-        return false;
-    }
     
     if (!cap.isOpened()) {
         return false; // Failed to open webcam
@@ -22,10 +18,24 @@ bool cv_actions::detect_face(
         return false; // Failed to capture full_frame
     }
 
+    if (search_bounds.width < 63 || search_bounds.height < 63) {
+        // Minimum size for the face detector is 63x63, otherwise it crashes(?)
+
+        search_bounds = cv::Rect(
+            0,
+            0,
+            out_frame.cols,
+            out_frame.rows
+        ); // Reset search bounds
+        return false;
+    }
+
+
     face_model->setInputSize(search_bounds.size());
 
     cv::Mat sub_mat = cv::Mat(out_frame, search_bounds);
     cv::Mat output_array;
+
     face_model->detect(sub_mat, output_array);
 
     if (output_array.rows == 0) {
@@ -43,9 +53,6 @@ bool cv_actions::detect_face(
     int face_width = (int)output_array.at<float>(0, 2);
     int face_height = (int)output_array.at<float>(0, 3);
     cv::Rect face_rect(face_x, face_y, face_width, face_height);
-
-
-    std::cout << "Left eye x position: " << (double)(output_array.at<float>(0, 6) + search_bounds.x - out_frame.cols/2) << std::endl;
 
     left_eye_position_proportion_from_center = std::make_tuple(
         (double)(output_array.at<float>(0, 6) + search_bounds.x - out_frame.cols/2) / out_frame.cols * 2,

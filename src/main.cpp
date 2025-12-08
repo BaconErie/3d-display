@@ -53,24 +53,59 @@ void request_cv_process_update() {
             // Run action
             std::tuple<double, double> left_eye_position_proportion_from_center;
             std::tuple<double, double> right_eye_position_proportion_from_center;
-            cv_actions::detect_face(shared_vars::face_detector_pointer, shared_vars::bounding_box, shared_vars::webcam_capture, output, left_eye_position_proportion_from_center, right_eye_position_proportion_from_center);
-        
-            shared_vars::left_eye_horizontal_angle = std::get<0>(left_eye_position_proportion_from_center) * (parameters::webcam_fov_deg / 2.0f);
-            shared_vars::left_eye_vertical_angle = std::get<1>(left_eye_position_proportion_from_center) * (parameters::webcam_fov_deg / 2.0f);
-            shared_vars::right_eye_horizontal_angle = std::get<0>(right_eye_position_proportion_from_center) * (parameters::webcam_fov_deg / 2.0f);
-            shared_vars::right_eye_vertical_angle = std::get<1>(right_eye_position_proportion_from_center) * (parameters::webcam_fov_deg / 2.0f);
+            bool result = cv_actions::detect_face(shared_vars::face_detector_pointer, shared_vars::bounding_box, shared_vars::webcam_capture, output, left_eye_position_proportion_from_center, right_eye_position_proportion_from_center);
+            
+            if (result) {
+                shared_vars::left_eye_horizontal_angle = std::get<0>(left_eye_position_proportion_from_center) * (parameters::webcam_fov_deg / 2.0f);
+                shared_vars::left_eye_vertical_angle = std::get<1>(left_eye_position_proportion_from_center) * (parameters::webcam_fov_deg / 2.0f);
+                shared_vars::right_eye_horizontal_angle = std::get<0>(right_eye_position_proportion_from_center) * (parameters::webcam_fov_deg / 2.0f);
+                shared_vars::right_eye_vertical_angle = std::get<1>(right_eye_position_proportion_from_center) * (parameters::webcam_fov_deg / 2.0f);
 
-            if (shared_vars::is_renderer_active) {
-                std::vector<int64_t> request_code;
-                request_code.push_back((int64_t)4);
-                boost::asio::write(shared_vars::socket, boost::asio::buffer(request_code));
+                if (shared_vars::is_renderer_active) {
+                    std::vector<int64_t> request_code;
+                    request_code.push_back((int64_t)4);
+                    boost::asio::write(shared_vars::socket, boost::asio::buffer(request_code));
 
-                std::vector<double_t> message;
-                message.push_back((double_t)shared_vars::left_eye_horizontal_angle);
-                message.push_back((double_t)shared_vars::left_eye_vertical_angle);
-                message.push_back((double_t)shared_vars::right_eye_horizontal_angle);
-                message.push_back((double_t)shared_vars::right_eye_vertical_angle);
-                boost::asio::write(shared_vars::socket, boost::asio::buffer(message));
+                    std::cout << "Main.cpp. Line 69" << std::endl;
+
+                    std::vector<double_t> message;
+                    message.push_back((double_t)shared_vars::left_eye_horizontal_angle);
+                    message.push_back((double_t)shared_vars::left_eye_vertical_angle);
+                    message.push_back((double_t)shared_vars::right_eye_horizontal_angle);
+                    message.push_back((double_t)shared_vars::right_eye_vertical_angle);
+                    boost::asio::write(shared_vars::socket, boost::asio::buffer(message));
+
+                    std::cout << "Main.cpp. Line 78" << std::endl;
+
+                    // Ask for display width
+                    std::int64_t display_width_request[] = {3};
+                    boost::asio::write(shared_vars::socket, boost::asio::buffer(display_width_request));
+
+                    std::cout << "Main.cpp. Line 84" << std::endl;
+
+                    std::uint64_t response[1];
+                    boost::system::error_code error;
+                    shared_vars::socket.read_some(boost::asio::buffer(response), error);
+
+                    parameters::window_width = response[0];
+
+                    unsigned char is_first_segment_left_eye = (char)0;
+                    std::vector<uint64_t> segments_vector;
+
+                    interlacer::calculate_segments(
+                        parameters::window_width,
+                        is_first_segment_left_eye,
+                        segments_vector,
+                        shared_vars::left_eye_horizontal_angle,
+                        shared_vars::right_eye_horizontal_angle
+                    );
+
+                    std::cout << "line 97. this is the uh segments vector we are going to send to the renderer";
+                    for (uint64_t a : segments_vector) {
+                        std::cout << a << " ";
+                    }
+                    std::cout << std::endl;
+                }
             }
         }
 

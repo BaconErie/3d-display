@@ -132,6 +132,7 @@ void event_handlers::on_vertical_displacement_continue_clicked(GtkWidget *widget
   
   // Set up interlacer variables
   interlacer::setup();
+  interlacer::calculate_pixel_exit_angles();
 
   // Switch to the measurements calibration stack
   gtk_stack_set_visible_child_name(shared_vars::stack_widget, "main_box");
