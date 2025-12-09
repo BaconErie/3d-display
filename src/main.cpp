@@ -83,14 +83,16 @@ void request_cv_process_update() {
 
                     std::cout << "Main.cpp. Line 84" << std::endl;
 
-                    std::uint64_t response[1];
+                    std::int64_t response[1];
                     boost::system::error_code error;
                     shared_vars::socket.read_some(boost::asio::buffer(response), error);
+
+                    std::cout << "Done reading" << std::endl;
 
                     parameters::window_width = response[0];
 
                     unsigned char is_first_segment_left_eye = (char)0;
-                    std::vector<uint64_t> segments_vector;
+                    std::vector<int64_t> segments_vector;
 
                     interlacer::calculate_segments(
                         parameters::window_width,
@@ -101,10 +103,15 @@ void request_cv_process_update() {
                     );
 
                     std::cout << "line 97. this is the uh segments vector we are going to send to the renderer";
-                    for (uint64_t a : segments_vector) {
+                    for (int64_t a : segments_vector) {
                         std::cout << a << " ";
                     }
                     std::cout << std::endl;
+
+                    // Send the segments_vector
+                    std::int64_t segments_vector_code[] = {5};
+                    boost::asio::write(shared_vars::socket, boost::asio::buffer(segments_vector_code));
+                    boost::asio::write(shared_vars::socket, boost::asio::buffer(segments_vector));
                 }
             }
         }

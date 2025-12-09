@@ -93,7 +93,7 @@ void interlacer::calculate_pixel_exit_angles() {
 void interlacer::calculate_segments(
     int renderer_width,
     unsigned char& is_first_segment_left_eye,
-    std::vector<uint64_t>& segments_vector,
+    std::vector<int64_t>& segments_vector,
     float left_eye_horizontal_angle,
     float right_eye_horizontal_angle
 ) {
@@ -129,10 +129,12 @@ void interlacer::calculate_segments(
         // Closer to left eye
         is_first_segment_left_eye = 0;
         is_known_pixels_for_left_eye = true;
+        segments_vector.push_back(0);
     } else {
         // Closer to right eye
         is_first_segment_left_eye = 1;
         is_known_pixels_for_left_eye = false;
+        segments_vector.push_back(1);
     }
 
     int unknown_pixels_count = 0;
@@ -171,7 +173,6 @@ void interlacer::calculate_segments(
         //std::cout << std::endl;
 
         if (did_eye_flip) {
-            std::cout << "Interlacer.cpp. line 173. did_eye_flip triggered. pushing back onto the segments vector." << std::endl;
             segments_vector.push_back(known_pixels_count + unknown_pixels_count/2);
             known_pixels_count = unknown_pixels_count/2 + unknown_pixels_count%2;
             unknown_pixels_count = 0;
@@ -180,11 +181,13 @@ void interlacer::calculate_segments(
     }
 
     //std::cout << "interlacer.cpp this is line 155. we will now print out segments vector. ";
-    for (uint64_t a : segments_vector) {
+    for (int64_t a : segments_vector) {
         //std::cout << a << " ";
     }
     //std::cout << std::endl;
     //std::cout << "And the length is " << segments_vector.size() << std::endl;
+
+    segments_vector.push_back(-1);
 
     interlacer::pixel_exit_angles_mutex.unlock();
 }

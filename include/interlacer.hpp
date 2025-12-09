@@ -28,7 +28,7 @@ namespace interlacer {
     void calculate_segments(
         int renderer_width,
         unsigned char& is_first_segment_left_eye,
-        std::vector<uint64_t>& segments_vector,
+        std::vector<int64_t>& segments_vector,
         float left_eye_horizontal_angle,
         float right_eye_horizontal_angle
     );

@@ -124,7 +124,7 @@ void event_handlers::on_vertical_displacement_continue_clicked(GtkWidget *widget
   message.push_back((int64_t)3);
   boost::asio::write(shared_vars::socket, boost::asio::buffer(message));
 
-  std::uint64_t response[1];
+  std::int64_t response[1];
   boost::system::error_code error;
   shared_vars::socket.read_some(boost::asio::buffer(response), error);
 
