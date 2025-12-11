@@ -66,7 +66,7 @@ void request_cv_process_update() {
                     request_code.push_back((int64_t)4);
                     boost::asio::write(shared_vars::socket, boost::asio::buffer(request_code));
 
-                    std::cout << "Main.cpp. Line 69" << std::endl;
+                    //std::cout << "Main.cpp. Line 69" << std::endl;
 
                     std::vector<double_t> message;
                     message.push_back((double_t)shared_vars::left_eye_horizontal_angle);
@@ -75,19 +75,19 @@ void request_cv_process_update() {
                     message.push_back((double_t)shared_vars::right_eye_vertical_angle);
                     boost::asio::write(shared_vars::socket, boost::asio::buffer(message));
 
-                    std::cout << "Main.cpp. Line 78" << std::endl;
+                    //std::cout << "Main.cpp. Line 78" << std::endl;
 
                     // Ask for display width
                     std::int64_t display_width_request[] = {3};
                     boost::asio::write(shared_vars::socket, boost::asio::buffer(display_width_request));
 
-                    std::cout << "Main.cpp. Line 84" << std::endl;
+                    //std::cout << "Main.cpp. Line 84" << std::endl;
 
                     std::int64_t response[1];
                     boost::system::error_code error;
                     shared_vars::socket.read_some(boost::asio::buffer(response), error);
 
-                    std::cout << "Done reading" << std::endl;
+                    //std::cout << "Done reading" << std::endl;
 
                     parameters::window_width = response[0];
 
@@ -102,11 +102,11 @@ void request_cv_process_update() {
                         shared_vars::right_eye_horizontal_angle
                     );
 
-                    std::cout << "line 97. this is the uh segments vector we are going to send to the renderer";
-                    for (int64_t a : segments_vector) {
-                        std::cout << a << " ";
-                    }
-                    std::cout << std::endl;
+                    //std::cout << "line 97. this is the uh segments vector we are going to send to the renderer";
+                    //for (int64_t a : segments_vector) {
+                    //    std::cout << a << " ";
+                    //}
+                    //std::cout << std::endl;
 
                     // Send the segments_vector
                     std::int64_t segments_vector_code[] = {5};
