@@ -65,7 +65,7 @@ double interlacer::t(double x) {
         interlacer::N * std::sin(
             std::atan2(f_prime, 1)
         )
-    ) - std::atan2(f_prime, 1)) * 57.2957795;
+    ) - std::atan2(f_prime, 1)) * 57.2957795; // 57.2957795 converts it to degrees. It's 180/pi
 }
 
 void interlacer::calculate_pixel_exit_angles() {
