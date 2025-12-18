@@ -182,6 +182,7 @@ Box measurements_calibration_box {
         }
 
         Box {
+            margin-bottom: 20;
             orientation: horizontal;
 
             Label {
@@ -196,6 +197,24 @@ Box measurements_calibration_box {
                 label: " LPI";
             }
 
+        }
+
+        Label { 
+            label: "Enter the index of refraction for your lens sheet. If you don't know, put 1.5";
+            wrap: true;
+            xalign: 0;
+        }
+
+        Box {
+            orientation: horizontal;
+
+            Label {
+                label: "Index of refraction: ";
+            }
+
+            Entry index_of_refraction_entry {
+                placeholder-text: "1.5?";
+            }
         }
 
         Button measurements_continue_button {

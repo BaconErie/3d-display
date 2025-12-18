@@ -41,12 +41,26 @@ void event_handlers::on_measurements_continue_clicked(GtkWidget *widget, gpointe
 
   if (!was_parse_successful) return;
 
+  // Get the index of refraction
+  std::string index_of_refraction_input(gtk_editable_get_chars(shared_vars::index_of_refraction_editable, 0, -1));
+  was_parse_successful = false;
+
+  try {
+    parameters::index_of_refraction = std::stof(index_of_refraction_input);
+    was_parse_successful = true;
+  } catch (const std::invalid_argument& e) {
+    std::cerr << "Invalid input for lenticule density: " << e.what() << std::endl;
+  }
+
+  if (!was_parse_successful) return;
+
   float qr_code_angular_size = std::atan2(QR_CODE_WIDTH/2, parameters::qr_code_distance) * 2 *(180.0/3.141592653589793238463);
   parameters::webcam_fov_deg = qr_code_angular_size * parameters::qr_code_inverse_proportion;
 
   std::cout << "QR Code distance: " << parameters::qr_code_distance << " in." << std::endl;
   std::cout << "Webcam FOV: " << qr_code_angular_size << " degrees" << std::endl; 
   std::cout << "Lenticule density: " << parameters::lenticule_density << " LPI" << std::endl;
+  std::cout << "Index of refraction: " << parameters::index_of_refraction << std::endl;
 
   // Tell 3D renderer to display the measurement window
   std::vector<int64_t> message;
@@ -79,60 +93,13 @@ void event_handlers::on_display_density_continue_clicked(GtkWidget *widget, gpoi
   message.push_back((int64_t)1);
   boost::asio::write(shared_vars::socket, boost::asio::buffer(message));
 
-  // Switch to the horizontal displacement calibration stack
-  gtk_stack_set_visible_child_name(shared_vars::stack_widget, "horizontal_displacement_calibration_box");
-}
-
-void event_handlers::on_horizontal_displacement_continue_clicked(GtkWidget *widget, gpointer _)
-{
-  std::string horizontal_displacement_input(gtk_editable_get_chars(shared_vars::horizontal_displacement_editable, 0, -1));
-  bool was_parse_successful = false;
-
-  try {
-    parameters::horizontal_displacement = std::stof(horizontal_displacement_input);
-    was_parse_successful = true;
-  } catch (const std::invalid_argument& e) {
-    std::cerr << "Invalid input for horizontal displacement: " << e.what() << std::endl;
-  }
-
-  if (!was_parse_successful) return;
-
-  std::cout << "Horizontal displacement: " << parameters::horizontal_displacement << " in." << std::endl;
-
-  // Switch to the vertical displacement calibration stack
-  gtk_stack_set_visible_child_name(shared_vars::stack_widget, "vertical_displacement_calibration_box");
-}
-
-void event_handlers::on_vertical_displacement_continue_clicked(GtkWidget *widget, gpointer _)
-{
-  std::string vertical_displacement_input(gtk_editable_get_chars(shared_vars::vertical_displacement_editable, 0, -1));
-  bool was_parse_successful = false;
-
-  try {
-    parameters::vertical_displacement = std::stof(vertical_displacement_input);
-    was_parse_successful = true;
-  } catch (const std::invalid_argument& e) {
-    std::cerr << "Invalid input for vertical displacement: " << e.what() << std::endl;
-  }
-
-  if (!was_parse_successful) return;
-
-  std::cout << "Vertical displacement: " << parameters::vertical_displacement << " in." << std::endl;
-
-  // Ask for horizontal window size from 3D renderer
-  std::vector<int64_t> message;
-  message.push_back((int64_t)3);
-  boost::asio::write(shared_vars::socket, boost::asio::buffer(message));
-
-  std::int64_t response[1];
-  boost::system::error_code error;
-  shared_vars::socket.read_some(boost::asio::buffer(response), error);
-
-  parameters::window_width = response[0];
-  
-  // Set up interlacer variables
-  interlacer::setup();
-  interlacer::calculate_pixel_exit_angles();
+  // Find pixels per lens, and send it to the 3D renderer
+  // Also send the index of refraction
+  float pixels_per_lens = 500.0 / parameters::green_to_red_line_distance / parameters::lenticule_density;
+  std::cout << "Event handlers.cpp. Line 84. pixels_per_lens is " << pixels_per_lens << std::endl;
+  boost::asio::write(shared_vars::socket, boost::asio::buffer({(int64_t)2}));
+  boost::asio::write(shared_vars::socket, boost::asio::buffer({(float_t)pixels_per_lens}));
+  boost::asio::write(shared_vars::socket, boost::asio::buffer({(float_t)parameters::index_of_refraction}));
 
   // Switch to the measurements calibration stack
   gtk_stack_set_visible_child_name(shared_vars::stack_widget, "main_box");
@@ -149,7 +116,7 @@ void event_handlers::on_start_display_clicked(GtkWidget *widget, gpointer _) {
   shared_vars::acceptor.bind(shared_vars::endpoint);
   shared_vars::acceptor.listen(1);
 
-  std::thread t(interlacer::listen_for_renderer_socket_and_call_dispatcher);
+  std::thread t(shared_vars::listen_for_renderer_socket_and_call_dispatcher);
   t.detach();
 }
 

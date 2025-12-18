@@ -11,6 +11,8 @@
 
 #include <boost/asio.hpp>
 
+#include <mutex>
+
 namespace shared_vars {
     extern GdkPaintable* webcam_paintable;
 
@@ -30,6 +32,7 @@ namespace shared_vars {
     extern GtkEditable* qr_code_distance_editable;
     extern GtkEditable* lenticule_density_editable;
     extern GtkEditable* green_red_line_distance_editable;
+    extern GtkEditable* index_of_refraction_editable;
     extern GtkEditable* horizontal_displacement_editable;
     extern GtkEditable* vertical_displacement_editable;
 
@@ -47,6 +50,8 @@ namespace shared_vars {
     extern double right_eye_horizontal_angle;
     extern double left_eye_vertical_angle;
     extern double right_eye_vertical_angle;
+
+    void listen_for_renderer_socket_and_call_dispatcher(); // Run this in a new thread, because socket accept blocks.
 }
 
 namespace parameters {
@@ -54,6 +59,7 @@ namespace parameters {
     extern float qr_code_inverse_proportion;
     extern float webcam_fov_deg;
     extern float lenticule_density;
+    extern float index_of_refraction;
     extern float green_to_red_line_distance;
     extern float horizontal_displacement;
     extern float vertical_displacement;

@@ -66,52 +66,12 @@ void request_cv_process_update() {
                     request_code.push_back((int64_t)4);
                     boost::asio::write(shared_vars::socket, boost::asio::buffer(request_code));
 
-                    //std::cout << "Main.cpp. Line 69" << std::endl;
-
                     std::vector<double_t> message;
                     message.push_back((double_t)shared_vars::left_eye_horizontal_angle);
                     message.push_back((double_t)shared_vars::left_eye_vertical_angle);
                     message.push_back((double_t)shared_vars::right_eye_horizontal_angle);
                     message.push_back((double_t)shared_vars::right_eye_vertical_angle);
                     boost::asio::write(shared_vars::socket, boost::asio::buffer(message));
-
-                    //std::cout << "Main.cpp. Line 78" << std::endl;
-
-                    // Ask for display width
-                    std::int64_t display_width_request[] = {3};
-                    boost::asio::write(shared_vars::socket, boost::asio::buffer(display_width_request));
-
-                    //std::cout << "Main.cpp. Line 84" << std::endl;
-
-                    std::int64_t response[1];
-                    boost::system::error_code error;
-                    shared_vars::socket.read_some(boost::asio::buffer(response), error);
-
-                    //std::cout << "Done reading" << std::endl;
-
-                    parameters::window_width = response[0];
-
-                    unsigned char is_first_segment_left_eye = (char)0;
-                    std::vector<int64_t> segments_vector;
-
-                    interlacer::calculate_segments(
-                        parameters::window_width,
-                        is_first_segment_left_eye,
-                        segments_vector,
-                        shared_vars::left_eye_horizontal_angle,
-                        shared_vars::right_eye_horizontal_angle
-                    );
-
-                    //std::cout << "line 97. this is the uh segments vector we are going to send to the renderer";
-                    //for (int64_t a : segments_vector) {
-                    //    std::cout << a << " ";
-                    //}
-                    //std::cout << std::endl;
-
-                    // Send the segments_vector
-                    std::int64_t segments_vector_code[] = {5};
-                    boost::asio::write(shared_vars::socket, boost::asio::buffer(segments_vector_code));
-                    boost::asio::write(shared_vars::socket, boost::asio::buffer(segments_vector));
                 }
             }
         }
@@ -250,8 +210,6 @@ activate (GtkApplication *app,
     g_signal_connect(calibrate_button, "clicked", G_CALLBACK(event_handlers::on_calibrate_button_clicked), NULL);
     g_signal_connect(fov_calibration_capture_button, "clicked", G_CALLBACK(event_handlers::on_fov_calibration_capture_clicked), NULL);
     g_signal_connect(display_density_continue_button, "clicked", G_CALLBACK(event_handlers::on_display_density_continue_clicked), NULL);
-    g_signal_connect(horizontal_displacement_continue_button, "clicked", G_CALLBACK(event_handlers::on_horizontal_displacement_continue_clicked), NULL);
-    g_signal_connect(vertical_displacement_continue_button, "clicked", G_CALLBACK(event_handlers::on_vertical_displacement_continue_clicked), NULL);
     g_signal_connect(measurements_continue_button, "clicked", G_CALLBACK(event_handlers::on_measurements_continue_clicked), NULL);
     g_signal_connect(start_display_button, "clicked", G_CALLBACK(event_handlers::on_start_display_clicked), NULL);
 
@@ -263,6 +221,7 @@ activate (GtkApplication *app,
     // Set up the entry pointers
     shared_vars::qr_code_distance_editable = GTK_EDITABLE(gtk_builder_get_object(shared_vars::builder, "qr_code_distance_entry"));
     shared_vars::lenticule_density_editable = GTK_EDITABLE(gtk_builder_get_object(shared_vars::builder, "lenticule_density_entry"));
+    shared_vars::index_of_refraction_editable = GTK_EDITABLE(gtk_builder_get_object(shared_vars::builder, "index_of_refraction_entry"));
     shared_vars::green_red_line_distance_editable = GTK_EDITABLE(gtk_builder_get_object(shared_vars::builder, "green_red_line_distance_entry"));
     shared_vars::horizontal_displacement_editable = GTK_EDITABLE(gtk_builder_get_object(shared_vars::builder, "horizontal_displacement_entry"));
     shared_vars::vertical_displacement_editable = GTK_EDITABLE(gtk_builder_get_object(shared_vars::builder, "vertical_displacement_entry"));

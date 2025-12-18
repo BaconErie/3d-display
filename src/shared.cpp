@@ -16,6 +16,7 @@ namespace shared_vars {
 
     GtkEditable* qr_code_distance_editable = nullptr;
     GtkEditable* lenticule_density_editable = nullptr;
+    GtkEditable* index_of_refraction_editable = nullptr;
     GtkEditable* green_red_line_distance_editable = nullptr;
     GtkEditable* horizontal_displacement_editable = nullptr;
     GtkEditable* vertical_displacement_editable = nullptr;
@@ -38,11 +39,19 @@ namespace shared_vars {
     double right_eye_vertical_angle = 0;
 }
 
+void shared_vars::listen_for_renderer_socket_and_call_dispatcher() {
+    //std::cout << "Beginning listen." << std::endl;
+    shared_vars::acceptor.accept(shared_vars::socket);
+    //std::cout << "We accepted something!!!!." << std::endl;
+    shared_vars::renderer_ready_dispatcher.emit();
+}
+
 namespace parameters {
     float qr_code_distance = 0;
     float qr_code_inverse_proportion = 0;
     float webcam_fov_deg = 0;
     float lenticule_density = 0;
+    float index_of_refraction = 1.5;
     float green_to_red_line_distance = 0;
     float horizontal_displacement = 0;
     float vertical_displacement = 0;
