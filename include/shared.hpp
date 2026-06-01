@@ -50,8 +50,10 @@ namespace shared_vars {
     extern GtkEditable* green_red_line_distance_editable;
     extern GtkEditable* main_horizontal_offset_editable;
     extern GtkEditable* main_vertical_offset_editable;
+    extern GtkEditable* main_z_offset_editable;
     extern GtkEditable* second_horizontal_offset_editable;
     extern GtkEditable* second_vertical_offset_editable;
+    extern GtkEditable* second_z_offset_editable;
 
     extern std::thread cv_process_thread;
     extern bool is_current_cv_action_face;
@@ -105,9 +107,11 @@ namespace parameters {
     extern float pixels_per_lens;
     extern float main_camera_horizontal_offset_inches;
     extern float main_camera_vertical_offset_inches;
+    extern float main_camera_z_offset_inches;
     extern float display_density_ppi;
     extern float second_camera_horizontal_intrinsic_parameter;
     extern float second_camera_vertical_intrinsic_parameter;
     extern float second_camera_horizontal_offset_inches;
     extern float second_camera_vertical_offset_inches;
+    extern float second_camera_z_offset_inches;
 }

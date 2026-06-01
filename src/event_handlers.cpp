@@ -9,11 +9,13 @@ void save_parameters() {
         save_file << parameters::pixels_per_lens << std::endl;
         save_file << parameters::main_camera_horizontal_offset_inches << std::endl;
         save_file << parameters::main_camera_vertical_offset_inches << std::endl;
+        save_file << parameters::main_camera_z_offset_inches << std::endl;
         save_file << parameters::display_density_ppi << std::endl;
         save_file << parameters::second_camera_horizontal_intrinsic_parameter << std::endl;
         save_file << parameters::second_camera_vertical_intrinsic_parameter << std::endl;
         save_file << parameters::second_camera_horizontal_offset_inches << std::endl;
         save_file << parameters::second_camera_vertical_offset_inches << std::endl;
+        save_file << parameters::second_camera_z_offset_inches << std::endl;
 
         save_file.close();
     }
@@ -202,6 +204,27 @@ void event_handlers::on_main_vertical_offset_continue_clicked(GtkWidget *widget,
     std::cout << "vertical offset: " << parameters::main_camera_vertical_offset_inches << " in." << std::endl;
 
 
+    // Switch to the Z offset calibration stack
+    gtk_stack_set_visible_child_name(shared_vars::stack_widget, "main_z_offset_calibration_box");
+}
+
+void event_handlers::on_main_z_offset_continue_clicked(GtkWidget* widget, gpointer data)
+{
+    std::string z_offset_input(gtk_editable_get_chars(shared_vars::main_z_offset_editable, 0, -1));
+    bool was_parse_successful = false;
+
+    try {
+        parameters::main_camera_z_offset_inches = std::stof(z_offset_input);
+        was_parse_successful = true;
+    } catch (const std::invalid_argument& e) {
+        std::cerr << "Invalid input for main camera z offset: " << e.what() << std::endl;
+    }
+
+    if (!was_parse_successful) return;
+
+    std::cout << "Z offset: " << parameters::main_camera_z_offset_inches << " in." << std::endl;
+
+
     // Check if second webcam is connected. If so, calibrate the offset for that
     if (shared_vars::second_webcam_capture.isOpened()) {
         // Second webcam opened
@@ -255,6 +278,24 @@ void event_handlers::on_second_vertical_offset_continue_clicked(GtkWidget *widge
 
     std::cout << "SECOND CAMERA Vertical offset: " << parameters::second_camera_vertical_offset_inches << " in." << std::endl;
 
+    gtk_stack_set_visible_child_name(shared_vars::stack_widget, "second_z_offset_calibration_box");
+}
+
+void event_handlers::on_second_z_offset_continue_clicked(GtkWidget* widget, gpointer data)
+{
+    std::string z_offset_input(gtk_editable_get_chars(shared_vars::second_z_offset_editable, 0, -1));
+    bool was_parse_successful = false;
+
+    try {
+        parameters::second_camera_z_offset_inches = std::stof(z_offset_input);
+        was_parse_successful = true;
+    } catch (const std::invalid_argument& e) {
+        std::cerr << "Invalid input for z offset: " << e.what() << std::endl;
+    }
+
+    if (!was_parse_successful) return;
+
+    std::cout << "SECOND CAMERA z offset: " << parameters::second_camera_z_offset_inches << " in." << std::endl;
 
 
     // Tell renderer to HIDE offset calibration window

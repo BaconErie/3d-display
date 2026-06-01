@@ -96,6 +96,12 @@ Box main_box {
                     label: "Calibrate";
                     hexpand: true;
                 }
+
+                Button switch_3d_mode {
+                    name: "switch_3d_mode";
+                    label: "Switch 3D mode";
+                    hexpand: true;
+                }
             }
 
 
@@ -406,6 +412,61 @@ Box main_vertical_offset_calibration_box {
     }
 }
 
+Box main_z_offset_calibration_box {
+    orientation: vertical;
+    spacing: 10;
+    margin-start: 20;
+    margin-end: 20;
+    margin-top: 20;
+    margin-bottom: 20;
+
+    Label {
+        name: "title_label";
+        label: "Calibration: Z offset";
+        xalign: 0;
+    }
+
+    Separator {
+        orientation: horizontal;
+    }
+
+    Box {
+        orientation: vertical;
+        spacing: 30;
+
+        Label {
+            label: "Measure the offset of the MAIN camera in the Z axis, i.e. how far out the camera comes out of the screen. Positive values denote out of the screen plane, negative values mean into the screen plane.";
+            xalign: 0;
+            wrap: true;
+        }
+
+        Box {
+            orientation: horizontal;
+
+            Label {
+                label: "Z offset: ";
+            }
+
+            Entry main_z_offset_entry {
+                placeholder-text: "Value in inches";
+            }
+
+            Label {
+                label: " in.";
+            }
+
+        }
+
+        Button main_z_offset_continue_button {
+            label: "Continue";
+            halign: start;
+        }
+
+        Picture z_offset_diagram {
+        }
+    }
+}
+
 Box second_horizontal_offset_calibration_box {
     orientation: vertical;
     spacing: 10;
@@ -510,6 +571,58 @@ Box second_vertical_offset_calibration_box {
     }
 }
 
+Box second_z_offset_calibration_box {
+    orientation: vertical;
+    spacing: 10;
+    margin-start: 20;
+    margin-end: 20;
+    margin-top: 20;
+    margin-bottom: 20;
+
+    Label {
+        name: "title_label";
+        label: "Calibration: Z offset for Second Camera";
+        xalign: 0;
+    }
+
+    Separator {
+        orientation: horizontal;
+    }
+
+    Box {
+        orientation: vertical;
+        spacing: 30;
+
+        Label {
+            label: "Measure the offset of the SECOND camera in the Z axis, i.e. how far out the camera comes out of the screen. Positive values denote out of the screen plane, negative values mean into the screen plane.";
+            xalign: 0;
+            wrap: true;
+        }
+
+        Box {
+            orientation: horizontal;
+
+            Label {
+                label: "Z offset: ";
+            }
+
+            Entry second_z_offset_entry {
+                placeholder-text: "Value in inches";
+            }
+
+            Label {
+                label: " in.";
+            }
+
+        }
+
+        Button second_z_offset_continue_button {
+            label: "Continue";
+            halign: start;
+        }
+    }
+}
+
 
 Window main_window {
     title: "3D Display Control Panel";
@@ -562,6 +675,12 @@ Window main_window {
         }
 
         StackPage {
+            name: "main_z_offset_calibration_box";
+            title: "main_z_offset_calibration_box";
+            child: main_z_offset_calibration_box;
+        }
+
+        StackPage {
             name: "second_horizontal_offset_calibration_box";
             title: "second_horizontal_offset_calibration_box";
             child: second_horizontal_offset_calibration_box;
@@ -571,6 +690,12 @@ Window main_window {
             name: "second_vertical_offset_calibration_box";
             title: "second_vertical_offset_calibration_box";
             child: second_vertical_offset_calibration_box;
+        }
+
+        StackPage {
+            name: "second_z_offset_calibration_box";
+            title: "second_z_offset_calibration_box";
+            child: second_z_offset_calibration_box;
         }
         
     }

@@ -59,6 +59,8 @@ void get_3d_coordinates_single_camera(
     // Calculate left eye and right eye depth
 
     // Vectors pointing to left and right eyes
+    // From https://visionbook.mit.edu/3d_learning.html#eq-3dcloudpointfromz
+    // Assume z = 1
     float l_vector_x = (0.5 - l_u)/parameters::main_camera_horizontal_intrinsic_parameter;
     float l_vector_y = (0.5 - l_v)/parameters::main_camera_vertical_intrinsic_parameter;
     float l_vector_z = 1;
@@ -177,12 +179,6 @@ void get_3d_coordinates_two_cameras(
     std::tuple<float, float, float>& left_eye_position_out,
     std::tuple<float, float, float>& right_eye_position_out
     ) {
-
-    std::cout << "Main Left eye uv: " << std::get<0>(main_left_eye_uv) << ", " << std::get<1>(main_left_eye_uv) << std::endl;
-    std::cout << "Main Right eye uv: " << std::get<0>(main_right_eye_uv) << ", " << std::get<1>(main_right_eye_uv) << std::endl;
-    std::cout << "Second Left eye uv: " << std::get<0>(second_left_eye_uv) << ", " << std::get<1>(second_left_eye_uv) << std::endl;
-    std::cout << "Second Right eye uv: " << std::get<0>(second_right_eye_uv) << ", " << std::get<1>(second_right_eye_uv) << std::endl;
-    std::cout << std::endl;
 
     float main_l_u = std::get<0>(main_left_eye_uv);
     float main_l_v = std::get<1>(main_left_eye_uv);
@@ -561,8 +557,10 @@ activate (GtkApplication *app,
     GtkWidget *change_object_button = GTK_WIDGET(gtk_builder_get_object(shared_vars::builder, "change_button"));
     GtkWidget *main_horizontal_offset_continue_button = GTK_WIDGET(gtk_builder_get_object(shared_vars::builder, "main_horizontal_offset_continue_button"));
     GtkWidget *main_vertical_offset_continue_button = GTK_WIDGET(gtk_builder_get_object(shared_vars::builder, "main_vertical_offset_continue_button"));
+    GtkWidget *main_z_offset_continue_button = GTK_WIDGET(gtk_builder_get_object(shared_vars::builder, "main_z_offset_continue_button"));
     GtkWidget *second_horizontal_offset_continue_button = GTK_WIDGET(gtk_builder_get_object(shared_vars::builder, "second_horizontal_offset_continue_button"));
     GtkWidget *second_vertical_offset_continue_button = GTK_WIDGET(gtk_builder_get_object(shared_vars::builder, "second_vertical_offset_continue_button"));
+    GtkWidget *second_z_offset_continue_button = GTK_WIDGET(gtk_builder_get_object(shared_vars::builder, "second_z_offset_continue_button"));
 
     g_signal_connect(calibrate_button, "clicked", G_CALLBACK(event_handlers::on_calibrate_button_clicked), NULL);
     g_signal_connect(switch_3d_mode_button, "clicked", G_CALLBACK(event_handlers::on_switch_3d_mode_clicked), NULL);
@@ -573,8 +571,10 @@ activate (GtkApplication *app,
     g_signal_connect(change_object_button, "clicked", G_CALLBACK(event_handlers::on_change_object_clicked), NULL);
     g_signal_connect(main_horizontal_offset_continue_button, "clicked", G_CALLBACK(event_handlers::on_main_horizontal_offset_continue_clicked), NULL);
     g_signal_connect(main_vertical_offset_continue_button, "clicked", G_CALLBACK(event_handlers::on_main_vertical_offset_continue_clicked), NULL);
+    g_signal_connect(main_z_offset_continue_button, "clicked", G_CALLBACK(event_handlers::on_main_z_offset_continue_clicked), NULL);
     g_signal_connect(second_horizontal_offset_continue_button, "clicked", G_CALLBACK(event_handlers::on_second_horizontal_offset_continue_clicked), NULL);
     g_signal_connect(second_vertical_offset_continue_button, "clicked", G_CALLBACK(event_handlers::on_second_vertical_offset_continue_clicked), NULL);
+    g_signal_connect(second_z_offset_continue_button, "clicked", G_CALLBACK(event_handlers::on_second_z_offset_continue_clicked), NULL);
 
     // Set up the editable pointers
     shared_vars::qr_code_distance_editable = GTK_EDITABLE(gtk_builder_get_object(shared_vars::builder, "qr_code_distance_entry"));
@@ -582,9 +582,10 @@ activate (GtkApplication *app,
     shared_vars::green_red_line_distance_editable = GTK_EDITABLE(gtk_builder_get_object(shared_vars::builder, "green_red_line_distance_entry"));
     shared_vars::main_horizontal_offset_editable = GTK_EDITABLE(gtk_builder_get_object(shared_vars::builder, "main_horizontal_offset_entry"));
     shared_vars::main_vertical_offset_editable = GTK_EDITABLE(gtk_builder_get_object(shared_vars::builder, "main_vertical_offset_entry"));
+    shared_vars::main_z_offset_editable = GTK_EDITABLE(gtk_builder_get_object(shared_vars::builder, "main_z_offset_entry"));
     shared_vars::second_horizontal_offset_editable = GTK_EDITABLE(gtk_builder_get_object(shared_vars::builder, "second_horizontal_offset_entry"));
     shared_vars::second_vertical_offset_editable = GTK_EDITABLE(gtk_builder_get_object(shared_vars::builder, "second_vertical_offset_entry"));
-
+    shared_vars::second_z_offset_editable = GTK_EDITABLE(gtk_builder_get_object(shared_vars::builder, "second_z_offset_entry"));
 
     // Show the window
     gtk_window_present (GTK_WINDOW (shared_vars::main_window));

@@ -26,8 +26,10 @@ namespace shared_vars {
     GtkEditable* green_red_line_distance_editable = nullptr;
     GtkEditable* main_horizontal_offset_editable = nullptr;
     GtkEditable* main_vertical_offset_editable = nullptr;
+    GtkEditable* main_z_offset_editable = nullptr;
     GtkEditable* second_horizontal_offset_editable = nullptr;
     GtkEditable* second_vertical_offset_editable = nullptr;
+    GtkEditable* second_z_offset_editable = nullptr;
 
 
     std::thread cv_process_thread;
@@ -80,6 +82,8 @@ void shared_vars::listen_for_renderer_socket_and_call_dispatcher() {
             std::getline(save_file, line);
             parameters::main_camera_vertical_offset_inches = std::stof(line);
             std::getline(save_file, line);
+            parameters::main_camera_z_offset_inches = std::stof(line);
+            std::getline(save_file, line);
             parameters::display_density_ppi = std::stof(line);
 
             std::getline(save_file, line);
@@ -93,6 +97,8 @@ void shared_vars::listen_for_renderer_socket_and_call_dispatcher() {
 
             std::getline(save_file, line);
             parameters::second_camera_vertical_offset_inches = std::stof(line);
+            std::getline(save_file, line);
+            parameters::second_camera_z_offset_inches = std::stof(line);
         } catch (const std::invalid_argument& e) {
             std::cerr << "Invalid settings file: " << e.what() << std::endl;
         }
@@ -120,9 +126,11 @@ namespace parameters {
     float pixels_per_lens = 0;
     float main_camera_horizontal_offset_inches = 0;
     float main_camera_vertical_offset_inches = 0;
+    float main_camera_z_offset_inches = 0;
     float display_density_ppi = 0;
     float second_camera_horizontal_intrinsic_parameter = 0;
     float second_camera_vertical_intrinsic_parameter = 0;
     float second_camera_horizontal_offset_inches = 0;
     float second_camera_vertical_offset_inches = 0;
+    float second_camera_z_offset_inches = 0;
 }
