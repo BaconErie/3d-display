@@ -1,0 +1,1 @@
+1. every time the window size changes, calculate the 
