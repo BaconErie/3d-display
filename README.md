@@ -10,11 +10,15 @@ As a demonstration of the 3D display, when the user moves around, the view of th
   <source src="docs/head-tracking.mp4" type="video/mp4">
 </video>
 
+<https://github.com/user-attachments/assets/779c0ef1-5423-477d-ad2a-4870c7691ab5>
+
 The 3D display is stereoscopic, meaning that the left and right eyes see different perspectives of the same object. This is how we perceive depth of physical objects. In the below video, head tracking is disabled, and the change in perspectives is a result of the display simultaneously showing the left and right eye perspectives, with the help of a lenticular lens.
 
 <video controls>
   <source src="docs/stereoscopic-miku.mp4" type="video/mp4">
 </video>
+
+<https://github.com/user-attachments/assets/00167c5d-7983-499c-8b82-7e43a4e308b3>
 
 Instead of a lenticular lens, users may also use 3D anaglyph glasses (those old red-blue 3D movie glasses). This video shows head tracking in 3D anaglyph mode (notice the red/cyan halos)...
 
@@ -22,11 +26,15 @@ Instead of a lenticular lens, users may also use 3D anaglyph glasses (those old 
   <source src="docs/head-tracking-anaglyph.mp4" type="video/mp4">
 </video>
 
+<https://github.com/user-attachments/assets/2461f202-a505-4ee5-a708-2908bd156fc9>
+
 ...and this video shows how each eye sees different perspectives depending on which color filter the eye is looking through.
 
 <video controls>
   <source src="docs/anaglyph-colors.mp4" type="video/mp4">
 </video>
+
+<https://github.com/user-attachments/assets/cb901769-71a6-4b66-a43f-c8c24947866d>
 
 This repo contains two main folders. The `controller` folder is a C++ project that builds to a directory containing a `3d_display_program` executable. The `renderer` program is a Godot project that should be built into a single executable named `renderer` and then moved into the same directory as the `3d_display_program`. With both sub-programs built, the `3d_display_program` should be run to start the system.
 
