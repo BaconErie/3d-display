@@ -62,5 +62,5 @@ CMakeUserPresets.json
 
 .vscode/
 
-build/
-dist/
+*/build/
+*/dist/
